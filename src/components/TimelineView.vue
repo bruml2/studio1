@@ -17,7 +17,7 @@
       <svg id="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
         <g id="eras"></g>
         /* goes last to be topmost drawn */
-        <g id="timeAxis"></g>
+        <g id="timeAxisGrp"></g>
       </svg>
     </div>
     <div id="tlFooter">
@@ -52,8 +52,15 @@
           "eraTopMargin":   30,
           "eraHeight":      300,
           "timeAxisHeight": 50,
+          "timeAxisVerticalOffset": 20,
+          "timeAxisStroke": "black",
+          "timeAxisStrokeWidth": 2,
+          "timeAxisFontFamily": "sans-serif",
+          "timeAxisFontSize": "13",
           "borderColor":    "#C11B17",
           "bgColor":        "bisque",
+          "colorWheel": ["FFF7FB", "ECE7F2", "D0D1E6", "A6BDDB",
+                         "74A9CF", "3690C0", "0570B0", "045A8D", "023858"],
         },
         renderCount: 0
       }
@@ -77,31 +84,61 @@
     mounted: function() {
       this.renderCount++
       this.removeEmptyHeaderFooter(this.tl)
-      this.renderTimeline(this.tl)
+      this.renderCircle(this.tl)
+      this.drawTimeAxis(this.tl)
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length + 
              tl.subtitle.trim().length === 0) {
-          // eslint-disable-next-line
-          console.log("header removed")
           document.getElementById("tlHeader").remove()
         }
         if (tl.footerText.trim().length === 0) {
-          // eslint-disable-next-line
-          console.log("footer removed")
           document.getElementById("tlFooter").remove()
         }
       },
-      renderTimeline(tl) {
+      renderCircle(tl) {
         d3.select('#svg')
           .append("circle")
-          .attr("cx", 140).attr("cy", 70).attr("r", 40).style("fill", "red")
+          .attr("cx", 70).attr("cy", 70).attr("r", 40).style("fill", "red")
         tl.new = 'added by renderTimeline()'
-        // html('<circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>')
+      },
+      drawTimeAxis(tl) {
+        // get tick values;
+        const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
+        const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
+        // a function which converts a year to an x coordinate;
+        tl.timeScaleFn = d3.scaleLinear()
+            .domain([tl.startYear, tl.stopYear])
+            .rangeRound([tl.svgSideMargin,
+                         tl.svgWidth - tl.svgSideMargin])
+            .nice();
+        // a function which returns the SVG for the axis;
+        const timeAxis = d3.axisBottom(tl.timeScaleFn)
+                .tickValues(tickValues)
+                .tickFormat(d3.format(".4"));
+                // .tickPadding(tl.timeAxisTickPadding)
+                // .tickSize(tl.timeAxisTickSize);
+        d3.select("#timeAxisGrp")
+            // default position is at top of SVG; move to bottom;
+            .attr("transform",
+                  "translate(0, " + (tl.eraTopMargin + tl.eraHeight +
+                                     tl.timeAxisVerticalOffset) + ")")
+            .call(timeAxis);
+
+        d3.selectAll("#timeAxisGrp line, #timeAxisGrp path")
+            .attr("stroke", tl.timeAxisStroke)
+            .attr("stroke-width", tl.timeAxisStrokeWidth)
+            .attr("fill", "none")
+            .attr("shape-rendering", "crispEdges");
+
+        d3.selectAll("#timeAxisGrp text")
+            .attr("font-family", tl.timeAxisFontFamily)
+            .attr("font-size", tl.timeAxisFontSize)
+            .attr("text-rendering", "optimizeLegibility");
+
       }
     }    
-
   }
 </script>
 

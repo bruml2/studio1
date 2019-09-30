@@ -67,7 +67,7 @@
     },
     watch: {
       timeline: function(val) {
-        Object.assign(this.tl, val)
+        this.tl = Object.assign({}, this.tl, val)
       }
     },
     created: function() {
@@ -75,7 +75,9 @@
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
+      this.renderCount++
       this.removeEmptyHeaderFooter(this.tl)
+      this.renderTimeline(this.tl)
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
@@ -90,6 +92,13 @@
           console.log("footer removed")
           document.getElementById("tlFooter").remove()
         }
+      },
+      renderTimeline(tl) {
+        d3.select('#svg')
+          .append("circle")
+          .attr("cx", 140).attr("cy", 70).attr("r", 40).style("fill", "red")
+        tl.new = 'added by renderTimeline()'
+        // html('<circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>')
       }
     }    
 

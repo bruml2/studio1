@@ -66,8 +66,8 @@
       } 
     },
     watch: {
-      timeline: function() {
-        Object.assign(this.tl, this.timeline)
+      timeline: function(val) {
+        Object.assign(this.tl, val)
       }
     },
     created: function() {

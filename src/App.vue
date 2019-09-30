@@ -35,7 +35,7 @@ export default {
     },
     addProperty() {
       // a new property in the timeline causes rerender;
-      Object.assign(this.timeline, {awesomeDeveloper: 'Beardsley'})
+      this.timeline = Object.assign({}, this.timeline, {awesomeDeveloper: 'Beardsley'})
     }
   }
 }

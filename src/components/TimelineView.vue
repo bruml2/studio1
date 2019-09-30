@@ -14,11 +14,10 @@
       <span id="tiSubtitle">{{ tl.subtitle }}</span>
     </div>
     <div id="tlTimeline">
-      <svg id="svg" :width="tl.svgWidth" :height="svgHeight">
-      <!--
+      <svg id="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
         <g id="eras"></g>
+        /* goes last to be topmost drawn */
         <g id="timeAxis"></g>
-      -->
       </svg>
     </div>
     <div id="tlFooter">
@@ -28,6 +27,8 @@
 </template>
 
 <script>
+  import * as d3 from 'd3'
+
   export default {
     props: {
       timeline: {
@@ -51,7 +52,7 @@
           "eraTopMargin":   30,
           "eraHeight":      300,
           "timeAxisHeight": 50,
-          "borderColor":    "#0404B4",
+          "borderColor":    "#C11B17",
           "bgColor":        "bisque",
         },
         renderCount: 0
@@ -64,6 +65,33 @@
                this.tl.timeAxisHeight
       } 
     },
+    watch: {
+      timeline: function() {
+        Object.assign(this.tl, this.timeline)
+      }
+    },
+    created: function() {
+      // merge prop into this.tl;
+      Object.assign(this.tl, this.timeline)
+    },
+    mounted: function() {
+      this.removeEmptyHeaderFooter(this.tl)
+    },
+    methods: {
+      removeEmptyHeaderFooter(tl) {
+        if (tl.title.trim().length + 
+             tl.subtitle.trim().length === 0) {
+          // eslint-disable-next-line
+          console.log("header removed")
+          document.getElementById("tlHeader").remove()
+        }
+        if (tl.footerText.trim().length === 0) {
+          // eslint-disable-next-line
+          console.log("footer removed")
+          document.getElementById("tlFooter").remove()
+        }
+      }
+    }    
 
   }
 </script>

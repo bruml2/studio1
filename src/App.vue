@@ -22,13 +22,16 @@ export default {
   },
   data() {
     return {
-      timeline: { fromParent: 'Original value' }
+      timeline: { fromParent: 'Original value',
+                  title: "AP European History",
+                  subtitle: "(from parent via prop)" }
     }
   },
   methods: {
     changeProperty() {
       // changing a value in the timeline obj causes rerender;
-      this.timeline.fromParent = 'Value changed'
+      // this.timeline.title = 'Value changed'
+      this.timeline = Object.assign({}, this.timeline, {title: "Value changed"})
     },
     addProperty() {
       // a new property in the timeline causes rerender;

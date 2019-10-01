@@ -1,7 +1,7 @@
 <template>
   <div id="timelineViewContainer">
     <div id="prolog">
-      <div>The TimelineView component has been rendered <span style="color: red">{{ renderCount }}</span> times.</div>
+      <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
       <ul>
         <li v-for="(value, key) in tl" :key="key">
           <b>{{ key }}:</b> {{ value }}
@@ -15,7 +15,7 @@
     </div>
     <div id="tlTimeline">
       <svg id="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
-        <g id="eras"></g>
+        <g id="erasGrp"></g>
         /* goes last to be topmost drawn */
         <g id="timeAxisGrp"></g>
       </svg>
@@ -46,7 +46,7 @@
           "footerText":   "Sample Footer Text",
           "startYear":      1900,
           "stopYear":       2000,
-          "tickInterval":   20,
+          "tickInterval":   10,
           "svgWidth":       1200,
           "svgSideMargin":  25,
           "eraTopMargin":   30,
@@ -61,8 +61,20 @@
           "bgColor":        "bisque",
           "colorWheel": ["FFF7FB", "ECE7F2", "D0D1E6", "A6BDDB",
                          "74A9CF", "3690C0", "0570B0", "045A8D", "023858"],
+          "erasArr": [
+            /* start and stop are years; topY(0 to 1) placement of top within
+              eraHeight; height is fraction of height(0 to 1); optional:
+              voffset is additional distance down for label; */
+            {label: "Era Area", start: 1900, stop: 2000,
+              topY: 0, height: 1.0, bgcolor: "#FFFFE0"},
+            {label: "Great War", start: 1914, stop: 1918,
+              topY: 0, height: 1.0, bgcolor: "#A9BCF5"},
+            {label: "WWII", start: 1939, stop: 1945,
+              topY: 0, height: 1.0, bgcolor: "#A9E2F3"},
+          ],
+
         },
-        renderCount: 0
+        numRenders: 0
       }
     },
     computed: {
@@ -82,10 +94,11 @@
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
-      this.renderCount++
+      this.numRenders++
       this.removeEmptyHeaderFooter(this.tl)
       this.renderCircle(this.tl)
-      this.drawTimeAxis(this.tl)
+      this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
+      this.drawEras(this.tl)
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
@@ -100,7 +113,7 @@
       renderCircle(tl) {
         d3.select('#svg')
           .append("circle")
-          .attr("cx", 70).attr("cy", 70).attr("r", 40).style("fill", "red")
+          .attr("cx", 1170).attr("cy", 40).attr("r", 20).style("fill", "red")
         tl.new = 'added by renderCircle()'
       },
       drawTimeAxis(tl) {
@@ -136,6 +149,31 @@
             .attr("font-family", tl.timeAxisFontFamily)
             .attr("font-size", tl.timeAxisFontSize)
             .attr("text-rendering", "optimizeLegibility");
+      },
+      drawEras(tl) {
+        /* typical era object: {label: "Great War", start: 1914, stop: 1918,
+              topY: 0, height: 1.0, bgcolor: "#A9BCF5"} */
+        d3.select("#erasGrp").selectAll("rect").data(tl.erasArr).enter()
+          // one rect for each object in the array;
+          .append("rect")
+            // the id is the label, e.g., "UnitedKingdom" (alphanum only);
+            .attr("id", function(d){ return d.label.replace(/\W/g, "") })
+            .attr("x", function(d){ return tl.timeScaleFn(d.start) })
+            .attr("y", function(d){ return tl.eraTopMargin + (d.topY * tl.eraHeight) })
+            // slightly rounded corners;
+            .attr("rx", 4)
+            .attr("ry", 4)
+            .attr("width", function(d){ return tl.timeScaleFn(d.stop) -
+                                              tl.timeScaleFn(d.start) })
+            .attr("height", function(d){ return d.height * tl.eraHeight })
+            .style("fill", function(d){ return d.bgcolor })
+            .style("stroke-width", 1)
+            .style("stroke", "black")
+            // show the two dates and the infoPanel;
+            .on("mouseover", function(){
+            })
+            .on("mouseout", function(){
+            });
 
       }
     }    

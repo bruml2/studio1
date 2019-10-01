@@ -101,7 +101,7 @@
         d3.select('#svg')
           .append("circle")
           .attr("cx", 70).attr("cy", 70).attr("r", 40).style("fill", "red")
-        tl.new = 'added by renderTimeline()'
+        tl.new = 'added by renderCircle()'
       },
       drawTimeAxis(tl) {
         // get tick values;

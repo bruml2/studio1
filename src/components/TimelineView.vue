@@ -19,6 +19,7 @@
         /* goes last to be topmost drawn */
         <g id="timeAxisGrp"></g>
       </svg>
+      <g id="eraLabelsGrp"></g>
     </div>
     <div id="tlFooter">
       {{ tl.footerText }}
@@ -65,12 +66,12 @@
             /* start and stop are years; topY(0 to 1) placement of top within
               eraHeight; height is fraction of height(0 to 1); optional:
               voffset is additional distance down for label; */
-            {label: "Era Area", start: 1900, stop: 2000,
-              topY: 0, height: 1.0, bgcolor: "#FFFFE0"},
-            {label: "Great War", start: 1914, stop: 1918,
-              topY: 0, height: 1.0, bgcolor: "#A9BCF5"},
-            {label: "WWII", start: 1939, stop: 1945,
-              topY: 0, height: 1.0, bgcolor: "#A9E2F3"},
+            {label: "Era Area", start: 1900, stop: 2000, bgcolor: "#FFFFE0"},
+            {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
+            {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
+            {label: "Vietnam", start: 1963, stop: 1975,
+              topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
+            {label: "Gulf", start: 1990, stop: 1991, bgcolor: "#FFF8DC"},
           ],
 
         },
@@ -98,7 +99,10 @@
       this.removeEmptyHeaderFooter(this.tl)
       this.renderCircle(this.tl)
       this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
+      this.normalizeEras(this.tl)
       this.drawEras(this.tl)
+      this.drawEraLabelsAsHTML(this.tl)
+      // this.drawDivs()
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
@@ -117,7 +121,7 @@
         tl.new = 'added by renderCircle()'
       },
       drawTimeAxis(tl) {
-        // get tick values;
+        // generate tick values;
         const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
         const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
         // a function which converts a year to an x coordinate;
@@ -150,9 +154,16 @@
             .attr("font-size", tl.timeAxisFontSize)
             .attr("text-rendering", "optimizeLegibility");
       },
+      normalizeEras(tl) {
+        // add topY, height, and voffset defaults;
+        tl.erasArr = tl.erasArr.map(
+          obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
+        )
+      },
       drawEras(tl) {
+        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error })
         /* typical era object: {label: "Great War", start: 1914, stop: 1918,
-              topY: 0, height: 1.0, bgcolor: "#A9BCF5"} */
+              topY: 0, height: 1.0, bgcolor: "#A9BCF5", voffset: 0} */
         d3.select("#erasGrp").selectAll("rect").data(tl.erasArr).enter()
           // one rect for each object in the array;
           .append("rect")
@@ -174,7 +185,74 @@
             })
             .on("mouseout", function(){
             });
-
+      },
+      drawEraLabelsAsHTML(tl) {
+        // const eraLabelsFontSize = "16px"; // add to tl;
+        // eraLabels as **HTML divs** to take advantage of text wrapping;
+        // if widest word is wider than the era itself, then it overflows;
+        // in such a case, we want to make the <div> wide enough and place
+        // in evenly straddling the era.
+        // create hidden dummy span;
+        const widthSpan = d3.select("body")
+            .append("span")
+            .attr("id", "overflowSpan")
+            .style("position", "absolute")
+            .style("visibility", "hidden");
+        // this function 
+        const getLeftAndStoreWidthVoffset = function(d) {
+          // does widest word overflow? Sort by length descending;
+          let words = d.label.split(/ /);
+          let longestWord = words.sort((a,b) => b.length - a.length)[0];
+          // console.log("Longest: " + longestWord);
+          // put the longest word into the span;
+          widthSpan.text(longestWord);
+          let longestWordWidth =
+                document.getElementById("overflowSpan").clientWidth;
+          console.log("Width of \"" + longestWord + "\": " + longestWordWidth);
+          let widthOfEra = tl.timeScaleFn(d.stop) - tl.timeScaleFn(d.start);
+          console.log("Width of " + d.label + " era: " + widthOfEra);
+          if (widthOfEra > longestWordWidth) {
+            /* If the longest word will fit in era, set width to that of era
+               and position div at start year; */
+            d.width = widthOfEra
+            return tl.timeScaleFn(d.start) + 20 + "px";
+          } else {
+            /* Else, div has width of longest word and is positioned to the
+               left of start year; */
+            d.width = longestWordWidth + 2;
+            // left is to the left of start by half of excess width + 2;
+            let left = tl.timeScaleFn(d.start) + 20 - 
+                            ((longestWordWidth - widthOfEra + 2) / 2);
+            console.log("  startYearX: " + tl.timeScaleFn(d.start))
+            console.log("  left: " + left);
+            return left + "px";
+          }
+        }; // end of function def;
+        // d3.select("#eraLabelsGrp")
+        d3.select("#tlTimeline")
+            .selectAll("div")
+            .data(tl.erasArr)
+            .enter()
+            // one div for each object in the array;
+          .append("div")
+            .attr("class", "eraLabel")
+            .attr("id", d => d.label.replace(/\W/g, "") + "Label")
+            // position against top-left corner of era with same width;
+            // .style("position", "absolute")
+            // need two versions: this if it fits; wider if not;
+            .style("left", d => getLeftAndStoreWidthVoffset(d))
+            .style("top", d => tl.eraTopMargin + 10 + (d.topY * tl.eraHeight) + d.voffset + "px")
+            .style("width", d => d.width + "px")
+            .text(d => d.label)
+        d3.select("#overflowSpan").remove();
+      },
+      drawDivs() {
+        // element not rendered although in DOM;
+        const tlT = document.getElementById("svg")
+        const newDiv = document.createElement("div")
+        const newContent = document.createTextNode("Hi there and greetings!")
+        newDiv.appendChild(newContent)
+        tlT.appendChild(newDiv)
       }
     }    
   }
@@ -231,5 +309,13 @@
 #tlTimeline {
   background-color: bisque;
   overflow-x: auto;
+}
+.eraLabel {
+  position: absolute;
+  z-index: 1;
+  text-align: center;
+  font-size: 16px;
+  color: black;
+  pointer-events: none;
 }
 </style>

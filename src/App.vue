@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <HelloWorld msg="The Studio1 App: TimelineView component is in the blue border below!" />
-    <TimelineView :timeline="timeline" />
+    <TimelineView :timeline="timeline" :tvcWidth="tvcWidth"/>
     <div id="btns">
       <button @click="changeProperty">Change Property Value</button>
       &nbsp; &nbsp;
@@ -24,7 +24,8 @@ export default {
     return {
       timeline: { fromParent: 'Original value',
                   title: "AP European History",
-                  subtitle: "(from parent via prop)" }
+                  subtitle: "(from parent via prop)" },
+      tvcWidth: 1302 /* allows for temporary 1px border */
     }
   },
   methods: {

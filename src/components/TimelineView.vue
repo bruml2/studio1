@@ -1,5 +1,7 @@
 <template>
-  <div id="timelineViewContainer">
+  <div id="timelineViewContainer"
+       :style="{ width: tvcWidth + 'px' }"
+  >
     <div id="prolog">
       <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
       <ul>
@@ -9,19 +11,23 @@
       </ul>
     </div>
 
-    <div id="tlHeader">
-      <span id="tlTitle">{{ tl.title }}</span> &nbsp; &nbsp;
-      <span id="tiSubtitle">{{ tl.subtitle }}</span>
+    <div id="tvHeader">
+      <span id="title">{{ tl.title }}</span> &nbsp; &nbsp;
+      <span id="subtitle">{{ tl.subtitle }}</span>
     </div>
-    <div id="tlTimeline">
+    <div id="tvTimeline">
+      <!--
       <svg id="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
+      svg: the height of the svg determines the height of the tvTimeline
+      -->
+      <svg id="svg" width="1200px" height="420px" xmlns="http://www.w3.org/2000/svg">
         <g id="erasGrp"></g>
         /* goes last to be topmost drawn */
         <g id="timeAxisGrp"></g>
       </svg>
-      <g id="eraLabelsGrp"></g>
+      <!-- class="eraLabel" divs will be added here -->
     </div>
-    <div id="tlFooter">
+    <div id="tvFooter">
       {{ tl.footerText }}
     </div>
   </div>
@@ -35,6 +41,12 @@
       timeline: {
         type: Object,
         required: true
+      },
+      // used in computed property 'styleObject';
+      tvcWidth: {
+        type: Number,
+        required: false,
+        default: 1300
       }
     },
     data() {
@@ -48,10 +60,10 @@
           "startYear":      1900,
           "stopYear":       2000,
           "tickInterval":   10,
-          "svgWidth":       1200,
-          "svgSideMargin":  25,
+          "svgWidth":       1274,
+          "svgSideMargin":  20,
           "eraTopMargin":   30,
-          "eraHeight":      300,
+          "eraHeight":      316, 
           "timeAxisHeight": 50,
           "timeAxisVerticalOffset": 20,
           "timeAxisStroke": "black",
@@ -95,11 +107,13 @@
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
+      /* do I need to wrap these calls in this.$nextTick()?? */
       this.numRenders++
       this.removeEmptyHeaderFooter(this.tl)
-      this.renderCircle(this.tl)
-      this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
+      // this.renderCircle(this.tl)
+      this.initDimensions(this.tl)
       this.normalizeEras(this.tl)
+      this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
       this.drawEras(this.tl)
       this.drawEraLabelsAsHTML(this.tl)
       // this.drawDivs()
@@ -108,10 +122,10 @@
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length + 
              tl.subtitle.trim().length === 0) {
-          document.getElementById("tlHeader").remove()
+          document.getElementById("tvHeader").remove()
         }
         if (tl.footerText.trim().length === 0) {
-          document.getElementById("tlFooter").remove()
+          document.getElementById("tvFooter").remove()
         }
       },
       renderCircle(tl) {
@@ -119,6 +133,27 @@
           .append("circle")
           .attr("cx", 1170).attr("cy", 40).attr("r", 20).style("fill", "red")
         tl.new = 'added by renderCircle()'
+      },
+      initDimensions(tl) {
+        const tvTimelineClientWidth = document.getElementById("tvTimeline").clientWidth
+        // other calculations depend on this tl value;
+        tl.svgWidth = tvTimelineClientWidth - (2 * tl.svgSideMargin)
+        const svgEl = document.getElementById("svg")
+        console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
+        console.log("svg width is: " + svgEl.clientWidth)
+        console.log("svg height is: " + svgEl.clientHeight)
+
+        svgEl.setAttribute("width", tl.svgWidth)
+        svgEl.setAttribute("height", this.svgHeight)
+        console.log("new svg width is: " + svgEl.clientWidth)
+        console.log("new svg height is: " + svgEl.clientHeight)
+      },
+      normalizeEras(tl) {
+        // add topY, height, and voffset defaults;
+        tl.erasArr = tl.erasArr.map(
+          obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
+        )
+        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error })
       },
       drawTimeAxis(tl) {
         // generate tick values;
@@ -154,14 +189,7 @@
             .attr("font-size", tl.timeAxisFontSize)
             .attr("text-rendering", "optimizeLegibility");
       },
-      normalizeEras(tl) {
-        // add topY, height, and voffset defaults;
-        tl.erasArr = tl.erasArr.map(
-          obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
-        )
-      },
       drawEras(tl) {
-        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error })
         /* typical era object: {label: "Great War", start: 1914, stop: 1918,
               topY: 0, height: 1.0, bgcolor: "#A9BCF5", voffset: 0} */
         d3.select("#erasGrp").selectAll("rect").data(tl.erasArr).enter()
@@ -229,7 +257,7 @@
           }
         }; // end of function def;
         // d3.select("#eraLabelsGrp")
-        d3.select("#tlTimeline")
+        d3.select("#tvTimeline")
             .selectAll("div")
             .data(tl.erasArr)
             .enter()
@@ -273,42 +301,45 @@
   text-align: left;
   columns: 3 auto;
 }
-/* this is the root of the final component:
-   it's horiz-centered within its parent and
+/* this is the root of the final component: it's
+   1300 wide by default or set by parent with a prop;
+   it's horiz-centered within a too-wide parent and
    scrolls if parent is too narrow;
 */
 #timelineViewContainer {
   font-family: Palatino, Times, "Times New Roman", Georgia, serif;
   box-sizing: border-box;
-  width: 1300px;
   margin: 0 auto;
   overflow-x: auto;
-  border: 2px solid blue;
+  border: 1px solid blue;  /* temp */
 }
-#tlHeader, #tlTimeline, #tlFooter {
+#tvHeader, #tvTimeline, #tvFooter {
   position: relative; /* parent container for positioning */
   box-sizing: border-box;
-  width: 96%;
+  width: 98%;
   margin: 20px auto;
   border: 3px solid #C11B17;
 }
-#tlHeader, #tlFooter {
+#tvHeader, #tvFooter {
   padding: 15px 30px;
-}
-#tlHeader {
-  font-weight: bold;
   text-align: left;
 }
-#tlTitle {
+#tvHeader {
+  font-weight: bold;
+}
+#title {
   font-size: 24px;
   color: #0404B4;
 }
-#tlSubtitle {
+#subtitle {
   font-size: 18px;
 }
-#tlTimeline {
+#tvTimeline {
   background-color: bisque;
   overflow-x: auto;
+}
+svg {
+  margin: 0 auto;
 }
 .eraLabel {
   position: absolute;

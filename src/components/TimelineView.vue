@@ -60,9 +60,12 @@
           "startYear":      1900,
           "stopYear":       2000,
           "tickInterval":   10,
-          "svgWidth":       1274,
+          // next 2 widths are default;
+          "tvTimelineClientWidth": 1268,
+          "svgWidth":       1228,
           "svgSideMargin":  20,
           "eraTopMargin":   30,
+          // eraHeight is default;
           "eraHeight":      316, 
           "timeAxisHeight": 50,
           "timeAxisVerticalOffset": 20,

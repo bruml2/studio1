@@ -2,7 +2,7 @@
   <div id="timelineViewContainer"
        :style="{ width: tvcWidth + 'px' }"
   >
-    <div id="prolog">
+    <div id="prolog"> <!-- this prolog is temporary: dev only -->
       <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
       <ul>
         <li v-for="(value, key) in tl" :key="key">
@@ -81,12 +81,13 @@
             /* start and stop are years; topY(0 to 1) placement of top within
               eraHeight; height is fraction of height(0 to 1); optional:
               voffset is additional distance down for label; */
-            {label: "Era Area", start: 1900, stop: 2000, bgcolor: "#FFFFE0"},
+            /* {label: "Era Area", start: 1900, stop: 2000, bgcolor: "#FFFFE0"}, */
             {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
             {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
-            {label: "Vietnam", start: 1963, stop: 1975,
+            {label: "Korean War", start: 1950, stop: 1953, bgcolor: "#D0D1E6"},
+            {label: "Vietnam War", start: 1963, stop: 1975,
               topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
-            {label: "Gulf", start: 1990, stop: 1991, bgcolor: "#FFF8DC"},
+            {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
           ],
 
         },
@@ -101,25 +102,21 @@
       } 
     },
     watch: {
-      timeline: function(val) {
-        this.tl = Object.assign({}, this.tl, val)
+      timeline: function(newVal) {
+      // merge new value of prop into this.tl; note that an assignment must be
+      // made to this.tl; having this.tl as the target object (1st param) does
+      // not cause a re-render.
+      this.tl = Object.assign({}, this.tl, newVal)
+      this.drawTimeline()
       }
     },
     created: function() {
-      // merge prop into this.tl;
+      // merge prop into this.tl as target;
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
-      /* do I need to wrap these calls in this.$nextTick()?? */
-      this.numRenders++
-      this.removeEmptyHeaderFooter(this.tl)
-      // this.renderCircle(this.tl)
-      this.initDimensions(this.tl)
-      this.normalizeEras(this.tl)
-      this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
-      this.drawEras(this.tl)
-      this.drawEraLabelsAsHTML(this.tl)
-      // this.drawDivs()
+      /* do I need to wrap this call in this.$nextTick()?? */
+      this.drawTimeline(this.tl)
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
@@ -131,15 +128,17 @@
           document.getElementById("tvFooter").remove()
         }
       },
-      renderCircle(tl) {
-        d3.select('#svg')
-          .append("circle")
-          .attr("cx", 1170).attr("cy", 40).attr("r", 20).style("fill", "red")
-        tl.new = 'added by renderCircle()'
+      drawTimeline() {
+        this.removeEmptyHeaderFooter(this.tl)
+        this.initDimensions(this.tl)
+        this.normalizeEras(this.tl)
+        this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
+        this.drawEras(this.tl)
+        this.drawEraLabelsAsHTML(this.tl)
       },
       initDimensions(tl) {
         const tvTimelineClientWidth = document.getElementById("tvTimeline").clientWidth
-        // other calculations depend on this tl value;
+        // other calculations depend on this tl.svgWidth value;
         tl.svgWidth = tvTimelineClientWidth - (2 * tl.svgSideMargin)
         const svgEl = document.getElementById("svg")
         console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
@@ -277,14 +276,6 @@
             .text(d => d.label)
         d3.select("#overflowSpan").remove();
       },
-      drawDivs() {
-        // element not rendered although in DOM;
-        const tlT = document.getElementById("svg")
-        const newDiv = document.createElement("div")
-        const newContent = document.createTextNode("Hi there and greetings!")
-        newDiv.appendChild(newContent)
-        tlT.appendChild(newDiv)
-      }
     }    
   }
 </script>

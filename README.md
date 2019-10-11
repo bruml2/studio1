@@ -1,10 +1,10 @@
-# historytimeline
+## studio1: the dev repo for the SFC Vue component TimelineView.vue
 
 ![Overview timeline](http://ruml.com/images/OverviewPlain48KB.jpg)
 
-_historytimeline_ is a library which draws history timelines on a random webpage requiring only the inclusion on the page of the library itself and the data file describing the timeline (no CSS file is required).  _historytimeline_ uses timeline data in a particular format which can be generated with the companion app _htlBuilder_ but is simple enough to be hand-coded.
+_TimelineView_ is a vuejs component which draws history timelines on a webpage requiring only the data file describing the timeline (no CSS file is required).  The ultimate goal is to develop a webapp which allows for easy generation of the JavaScript file which specifies the timeline.
 
-All of the code and documentation is available on GitHub [here](https://github.com/bruml2/historytimeline).  The project is ongoing and anyone with the interest and skill to contribute is welcome to contact the lead developer [b@ruml.com].  Design contributions are as eagerly sought as code.
+The project is ongoing and anyone with the interest and skill to contribute is welcome to contact the lead developer [b@ruml.com].  Design contributions are as eagerly sought as code.
 
 ### Features
 

@@ -4,8 +4,13 @@ Ben:
 
 With your wonderfully effective help, I've gotten a fair ways on the TimelineView component (lots of additional features but they pose no strategic issues).  I'd be grateful if you  could clone https://github.com/bruml2/studio1 and take a look.  Of course, please comment on any decisions you think are questonable. But here are the issues I wonder about and don't have the experience to resolve:
 
-1. The TimelineView component takes as props: 1) a required JS object ("timeline") which specifies the timeline (the default timeline "tl" is an initial data value in the component), and 2) an optional desired width for the component root.  The (future) "Timeline Studio" app will permit the user to change the value of the properties in the timeline object, and those changes should trigger a re-render of the timeline.  I have that behavior now but I wonder whether I've done it the best way.
+1. The TimelineView component takes two props: 1) a required JS object ("timeline") which specifies the timeline (the default timeline "tl" is an initial data value in the component), and 2) an optional desired width for the component root.  The (future) "Timeline Studio" app will permit the user to change the value of the properties in the timeline object, and those changes should trigger a re-render of the timeline.  I have that behavior now but I wonder whether I've done it the best way.
 
-The timeline is drawn using the values in tl. At the created lifecycle hook I'm merging the "timeline" prop into the tl object in data. Then I watch the prop and when it changes I do the merger again.
+The timeline is drawn using the values in tl. At the created lifecycle hook I'm merging the "timeline" prop into the tl object in data. Then I watch the "timeline" prop and when it changes I do the merger again and redraw the timeline. Is there a better way to do this?
 
-2. In order to take advantage of HTML word wrapping, I'm drawing the labels as absolutely-positioned <div>s.  This works fine until I want to scale the entire timeline: since the 
+2. The TimelineView is now id-free! I still need to add a way to identify each of several components used on the same page so that the JS can affect the intended timeline.
+
+
+
+
+2. In order to take advantage of HTML word wrapping, I'm drawing the labels as absolutely-positioned <div>s.  In an earlier (working) version, these divs were children of a <g> which was a child of the svg element.

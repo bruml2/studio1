@@ -4,11 +4,11 @@
     <TimelineView :timeline="timeline" :tvcWidth="tvcWidth"/>
     <div id="btns">
       <span>Demonstrating that changes within parent affect the TimelineView component: &nbsp; &nbsp; </span>
-      <button @click="changeProperty">Change Title Value</button>
+      <button class="button" @click="changeProperty">Change Title Value</button>
       &nbsp; &nbsp;
-      <button @click="addProperty">Add a new property</button>
+      <button class="button" @click="addProperty">Add a new property</button>
       &nbsp; &nbsp;
-      <button @click="addEra">Add a new era</button>
+      <button class="button" @click="addEra">Add a new era</button>
     </div>
   </div>
 </template>
@@ -74,7 +74,7 @@ export default {
   padding: 1rem;
   border: 2px solid teal;
 }
-#btns button {
+#btns .button {
   font-size: 1.2rem;
 }
 </style>

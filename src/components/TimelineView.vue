@@ -1,8 +1,8 @@
 <template>
-  <div id="timelineViewContainer"
+  <div class="timelineViewContainer"
        :style="{ width: tvcWidth + 'px' }"
   >
-    <div id="prolog"> <!-- this prolog is temporary: dev only -->
+    <div class="prolog"> <!-- this prolog is temporary: dev only -->
       <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
       <ul>
         <li v-for="(value, key) in tl" :key="key">
@@ -11,23 +11,23 @@
       </ul>
     </div>
 
-    <div id="tvHeader">
-      <span id="title">{{ tl.title }}</span> &nbsp; &nbsp;
-      <span id="subtitle">{{ tl.subtitle }}</span>
+    <div class="tvHeader">
+      <span class="title">{{ tl.title }}</span> &nbsp; &nbsp;
+      <span class="subtitle">{{ tl.subtitle }}</span>
     </div>
-    <div id="tvTimeline">
+    <div class="tvTimeline">
       <!--
-      <svg id="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
+      <svg class="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
       svg: the height of the svg determines the height of the tvTimeline
       -->
-      <svg id="svg" width="1200px" height="420px" xmlns="http://www.w3.org/2000/svg">
-        <g id="erasGrp"></g>
+      <svg class="svg" width="1200px" height="420px" xmlns="http://www.w3.org/2000/svg">
+        <g class="erasGrp"></g>
         /* goes last to be topmost drawn */
-        <g id="timeAxisGrp"></g>
+        <g class="timeAxisGrp"></g>
       </svg>
       <!-- class="eraLabel" divs will be added here -->
     </div>
-    <div id="tvFooter">
+    <div class="tvFooter">
       {{ tl.footerText }}
     </div>
   </div>
@@ -89,9 +89,9 @@
               topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
             {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
           ],
-
+          "eraLabelsFontSize": "16px",
         },
-        numRenders: 0
+        componentEl: null,
       }
     },
     computed: {
@@ -115,17 +115,21 @@
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
-      /* do I need to wrap this call in this.$nextTick()?? */
+      /* do I need to wrap this in this.$nextTick()?? */
+      let numComponents = document.getElementsByClassName("timelineViewContainer").length
+      if (numComponents == 1) {
+        this.componentEl = document.getElementsByClassName("timelineViewContainer")[0]
+      } else { throw new Error("multiple components")}
       this.drawTimeline(this.tl)
     },
     methods: {
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length + 
              tl.subtitle.trim().length === 0) {
-          document.getElementById("tvHeader").remove()
+          this.componentEl.getElementsByClassName("tvHeader")[0].remove()
         }
         if (tl.footerText.trim().length === 0) {
-          document.getElementById("tvFooter").remove()
+          this.componentEl.getElementsByClassName("tvFooter")[0].remove()
         }
       },
       drawTimeline() {
@@ -134,13 +138,14 @@
         this.normalizeEras(this.tl)
         this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
         this.drawEras(this.tl)
+        // console.log("before labels")
         this.drawEraLabelsAsHTML(this.tl)
       },
       initDimensions(tl) {
-        const tvTimelineClientWidth = document.getElementById("tvTimeline").clientWidth
+        const tvTimelineClientWidth = this.componentEl.getElementsByClassName("tvTimeline")[0].clientWidth
         // other calculations depend on this tl.svgWidth value;
         tl.svgWidth = tvTimelineClientWidth - (2 * tl.svgSideMargin)
-        const svgEl = document.getElementById("svg")
+        const svgEl = this.componentEl.getElementsByClassName("svg")[0]
         console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
         console.log("svg width is: " + svgEl.clientWidth)
         console.log("svg height is: " + svgEl.clientHeight)
@@ -155,7 +160,7 @@
         tl.erasArr = tl.erasArr.map(
           obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
         )
-        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error })
+        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error("bad key count in era") })
       },
       drawTimeAxis(tl) {
         // generate tick values;
@@ -173,20 +178,20 @@
                 .tickFormat(d3.format(".4"));
                 // .tickPadding(tl.timeAxisTickPadding)
                 // .tickSize(tl.timeAxisTickSize);
-        d3.select("#timeAxisGrp")
+        d3.select(".timeAxisGrp")
             // default position is at top of SVG; move to bottom;
             .attr("transform",
                   "translate(0, " + (tl.eraTopMargin + tl.eraHeight +
                                      tl.timeAxisVerticalOffset) + ")")
             .call(timeAxis);
 
-        d3.selectAll("#timeAxisGrp line, #timeAxisGrp path")
+        d3.selectAll(".timeAxisGrp line, .timeAxisGrp path")
             .attr("stroke", tl.timeAxisStroke)
             .attr("stroke-width", tl.timeAxisStrokeWidth)
             .attr("fill", "none")
             .attr("shape-rendering", "crispEdges");
 
-        d3.selectAll("#timeAxisGrp text")
+        d3.selectAll(".timeAxisGrp text")
             .attr("font-family", tl.timeAxisFontFamily)
             .attr("font-size", tl.timeAxisFontSize)
             .attr("text-rendering", "optimizeLegibility");
@@ -194,7 +199,7 @@
       drawEras(tl) {
         /* typical era object: {label: "Great War", start: 1914, stop: 1918,
               topY: 0, height: 1.0, bgcolor: "#A9BCF5", voffset: 0} */
-        d3.select("#erasGrp").selectAll("rect").data(tl.erasArr).enter()
+        d3.select(".erasGrp").selectAll("rect").data(tl.erasArr).enter()
           // one rect for each object in the array;
           .append("rect")
             // the id is the label, e.g., "UnitedKingdom" (alphanum only);
@@ -225,10 +230,10 @@
         // create hidden dummy span;
         const widthSpan = d3.select("body")
             .append("span")
-            .attr("id", "overflowSpan")
+            .attr("class", "overflowSpan")
             .style("position", "absolute")
             .style("visibility", "hidden");
-        // this function 
+        // nested function ============================== 
         const getLeftAndStoreWidthVoffset = function(d) {
           // does widest word overflow? Sort by length descending;
           let words = d.label.split(/ /);
@@ -236,8 +241,8 @@
           // console.log("Longest: " + longestWord);
           // put the longest word into the span;
           widthSpan.text(longestWord);
-          let longestWordWidth =
-                document.getElementById("overflowSpan").clientWidth;
+          // console.log("widthSpan clientWidth: ", widthSpan.property("clientWidth"))
+          let longestWordWidth = widthSpan.property("clientWidth")
           console.log("Width of \"" + longestWord + "\": " + longestWordWidth);
           let widthOfEra = tl.timeScaleFn(d.stop) - tl.timeScaleFn(d.start);
           console.log("Width of " + d.label + " era: " + widthOfEra);
@@ -253,28 +258,25 @@
             // left is to the left of start by half of excess width + 2;
             let left = tl.timeScaleFn(d.start) + 20 - 
                             ((longestWordWidth - widthOfEra + 2) / 2);
-            console.log("  startYearX: " + tl.timeScaleFn(d.start))
+            console.log("  startYearX: " + (tl.timeScaleFn(d.start) + tl.svgSideMargin))
             console.log("  left: " + left);
             return left + "px";
           }
         }; // end of function def;
-        // d3.select("#eraLabelsGrp")
-        d3.select("#tvTimeline")
+        //======================================
+        d3.select(".tvTimeline")
             .selectAll("div")
             .data(tl.erasArr)
             .enter()
-            // one div for each object in the array;
           .append("div")
             .attr("class", "eraLabel")
             .attr("id", d => d.label.replace(/\W/g, "") + "Label")
-            // position against top-left corner of era with same width;
-            // .style("position", "absolute")
-            // need two versions: this if it fits; wider if not;
             .style("left", d => getLeftAndStoreWidthVoffset(d))
             .style("top", d => tl.eraTopMargin + 10 + (d.topY * tl.eraHeight) + d.voffset + "px")
             .style("width", d => d.width + "px")
             .text(d => d.label)
-        d3.select("#overflowSpan").remove();
+            .style("font-size", this.eraLabelsFontSize)
+        widthSpan.remove();
       },
     }    
   }
@@ -282,16 +284,16 @@
 
 <style>
 /* the prolog is temporary */
-#prolog {
+.prolog {
   padding: 8px 15px;
   background: wheat;
   border: 8px solid palegreen;
 }
-#prolog div {
+.prolog div {
   font-weight: bold;
 
 }
-#prolog ul {
+.prolog ul {
   text-align: left;
   columns: 3 auto;
 }
@@ -300,35 +302,35 @@
    it's horiz-centered within a too-wide parent and
    scrolls if parent is too narrow;
 */
-#timelineViewContainer {
+.timelineViewContainer {
   font-family: Palatino, Times, "Times New Roman", Georgia, serif;
   box-sizing: border-box;
   margin: 0 auto;
   overflow-x: auto;
   border: 1px solid blue;  /* temp */
 }
-#tvHeader, #tvTimeline, #tvFooter {
+.tvHeader, .tvTimeline, .tvFooter {
   position: relative; /* parent container for positioning */
   box-sizing: border-box;
   width: 98%;
   margin: 20px auto;
   border: 3px solid #C11B17;
 }
-#tvHeader, #tvFooter {
+.tvHeader, .tvFooter {
   padding: 15px 30px;
   text-align: left;
 }
-#tvHeader {
+.tvHeader {
   font-weight: bold;
 }
-#title {
+.title {
   font-size: 24px;
   color: #0404B4;
 }
-#subtitle {
+.subtitle {
   font-size: 18px;
 }
-#tvTimeline {
+.tvTimeline {
   background-color: bisque;
   overflow-x: auto;
 }
@@ -339,7 +341,7 @@ svg {
   position: absolute;
   z-index: 1;
   text-align: center;
-  font-size: 16px;
+  font-size: 16px; /* default */
   color: black;
   pointer-events: none;
 }

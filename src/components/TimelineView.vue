@@ -1,5 +1,6 @@
 <template>
   <div class="timelineViewContainer"
+       :id="componentID"
        :style="{ width: tvcWidth + 'px' }"
   >
     <div class="prolog"> <!-- this prolog is temporary: dev only -->
@@ -17,18 +18,17 @@
     </div>
     <div class="tvTimeline">
       <!--
-      <svg class="svg" :width="tl.svgWidth" :height="svgHeight"  xmlns="http://www.w3.org/2000/svg">
+      svg width set to width of tvTimeline; height is computed value;
       svg: the height of the svg determines the height of the tvTimeline
       -->
-      <svg class="svg" width="1200px" height="420px" xmlns="http://www.w3.org/2000/svg">
+      <svg class="svg" width="1250px" height="400px" xmlns="http://www.w3.org/2000/svg">
         <g class="erasGrp"></g>
         /* goes last to be topmost drawn */
         <g class="timeAxisGrp"></g>
       </svg>
       <!-- class="eraLabel" divs will be added here -->
     </div>
-    <div class="tvFooter">
-      {{ tl.footerText }}
+    <div class="tvFooter" v-html="tl.footerHTML">
     </div>
   </div>
 </template>
@@ -38,6 +38,11 @@
 
   export default {
     props: {
+      componentID: {
+        type: String,
+        required: false,
+        default: "soleTimeline"
+      },
       timeline: {
         type: Object,
         required: true
@@ -56,25 +61,27 @@
           "dbKey": null,
           "title":        "AP United States History",
           "subtitle":     "(twentieth century)",
-          "footerText":   "Sample Footer Text",
+          "footerHTML":   "This is <b>bold</b> footer text.",
           "startYear":      1900,
           "stopYear":       2000,
           "tickInterval":   10,
+          "bgColor":        "bisque",
+          //   border: 3px solid #C11B17;
+          "borderWidth":    3,
+          "borderColor":    "#C11B17",
           // next 2 widths are default;
           "tvTimelineClientWidth": 1268,
           "svgWidth":       1228,
           "svgSideMargin":  20,
           "eraTopMargin":   30,
           // eraHeight is default;
-          "eraHeight":      316, 
+          "eraHeight":      320, 
           "timeAxisHeight": 50,
           "timeAxisVerticalOffset": 20,
           "timeAxisStroke": "black",
           "timeAxisStrokeWidth": 2,
           "timeAxisFontFamily": "sans-serif",
           "timeAxisFontSize": "13",
-          "borderColor":    "#C11B17",
-          "bgColor":        "bisque",
           "colorWheel": ["FFF7FB", "ECE7F2", "D0D1E6", "A6BDDB",
                          "74A9CF", "3690C0", "0570B0", "045A8D", "023858"],
           "erasArr": [
@@ -91,7 +98,7 @@
           ],
           "eraLabelsFontSize": "16px",
         },
-        componentEl: null,
+        rootEl: null,
       }
     },
     computed: {
@@ -116,36 +123,39 @@
     },
     mounted: function() {
       /* do I need to wrap this in this.$nextTick()?? */
-      let numComponents = document.getElementsByClassName("timelineViewContainer").length
-      if (numComponents == 1) {
-        this.componentEl = document.getElementsByClassName("timelineViewContainer")[0]
-      } else { throw new Error("multiple components")}
-      this.drawTimeline(this.tl)
+      this.rootEl = document.getElementById(this.componentID)
+      this.drawTimeline()
     },
     methods: {
-      removeEmptyHeaderFooter(tl) {
-        if (tl.title.trim().length + 
-             tl.subtitle.trim().length === 0) {
-          this.componentEl.getElementsByClassName("tvHeader")[0].remove()
-        }
-        if (tl.footerText.trim().length === 0) {
-          this.componentEl.getElementsByClassName("tvFooter")[0].remove()
-        }
-      },
       drawTimeline() {
         this.removeEmptyHeaderFooter(this.tl)
         this.initDimensions(this.tl)
-        this.normalizeEras(this.tl)
         this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
-        this.drawEras(this.tl)
-        // console.log("before labels")
-        this.drawEraLabelsAsHTML(this.tl)
+        if (Object.keys(this.tl).includes("erasArr") && this.tl.erasArr.length > 0) {
+          this.normalizeEras(this.tl)
+          this.drawEras(this.tl)
+          // console.log("before labels")
+          this.drawEraLabelsAsHTML(this.tl)
+        }
+      },
+      removeEmptyHeaderFooter(tl) {
+        if (tl.title.trim().length +  tl.subtitle.trim().length === 0) {
+          this.rootEl.getElementsByClassName("tvHeader")[0].remove()
+        }
+        if (tl.footerHTML.trim().length === 0) {
+          this.rootEl.getElementsByClassName("tvFooter")[0].remove()
+        }
       },
       initDimensions(tl) {
-        const tvTimelineClientWidth = this.componentEl.getElementsByClassName("tvTimeline")[0].clientWidth
+        const borderPropValue = tl.borderWidth + "px solid " + tl.borderColor
+        d3.select(this.rootEl).selectAll(".tvHeader, .tvTimeline, .tvFooter")
+          .style("border", borderPropValue)
+        // const tvTimelineEl = this.rootEl.getElementsByClassName("tvTimeline")[0]
+        // tvTimelineEl.style.border = tl.borderWidth + "px solid " + tl.borderColor
+        const tvTimelineClientWidth = this.rootEl.getElementsByClassName("tvTimeline")[0].clientWidth
         // other calculations depend on this tl.svgWidth value;
-        tl.svgWidth = tvTimelineClientWidth - (2 * tl.svgSideMargin)
-        const svgEl = this.componentEl.getElementsByClassName("svg")[0]
+        tl.svgWidth = tvTimelineClientWidth /* - (2 * tl.svgSideMargin) */
+        const svgEl = this.rootEl.getElementsByClassName("svg")[0]
         console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
         console.log("svg width is: " + svgEl.clientWidth)
         console.log("svg height is: " + svgEl.clientHeight)
@@ -154,13 +164,6 @@
         svgEl.setAttribute("height", this.svgHeight)
         console.log("new svg width is: " + svgEl.clientWidth)
         console.log("new svg height is: " + svgEl.clientHeight)
-      },
-      normalizeEras(tl) {
-        // add topY, height, and voffset defaults;
-        tl.erasArr = tl.erasArr.map(
-          obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
-        )
-        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error("bad key count in era") })
       },
       drawTimeAxis(tl) {
         // generate tick values;
@@ -173,41 +176,48 @@
                          tl.svgWidth - tl.svgSideMargin])
             .nice();
         // a function which returns the SVG for the axis;
-        const timeAxis = d3.axisBottom(tl.timeScaleFn)
+        const timeAxisFn = d3.axisBottom(tl.timeScaleFn)
                 .tickValues(tickValues)
                 .tickFormat(d3.format(".4"));
                 // .tickPadding(tl.timeAxisTickPadding)
                 // .tickSize(tl.timeAxisTickSize);
-        d3.select(".timeAxisGrp")
+        d3.select(this.rootEl).select(".timeAxisGrp")
             // default position is at top of SVG; move to bottom;
             .attr("transform",
                   "translate(0, " + (tl.eraTopMargin + tl.eraHeight +
                                      tl.timeAxisVerticalOffset) + ")")
-            .call(timeAxis);
+            .call(timeAxisFn);
 
-        d3.selectAll(".timeAxisGrp line, .timeAxisGrp path")
+        d3.select(this.rootEl).selectAll(".timeAxisGrp line, .timeAxisGrp path")
             .attr("stroke", tl.timeAxisStroke)
             .attr("stroke-width", tl.timeAxisStrokeWidth)
             .attr("fill", "none")
             .attr("shape-rendering", "crispEdges");
 
-        d3.selectAll(".timeAxisGrp text")
+        d3.select(this.rootEl).selectAll(".timeAxisGrp text")
             .attr("font-family", tl.timeAxisFontFamily)
             .attr("font-size", tl.timeAxisFontSize)
             .attr("text-rendering", "optimizeLegibility");
       },
+      normalizeEras(tl) {
+        // add topY, height, and voffset defaults;
+        tl.erasArr = tl.erasArr.map(
+          obj => Object.assign({}, {topY:0,height:1,voffset:0}, obj)
+        )
+        tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error("bad key count in era") })
+      },
       drawEras(tl) {
         /* typical era object: {label: "Great War", start: 1914, stop: 1918,
               topY: 0, height: 1.0, bgcolor: "#A9BCF5", voffset: 0} */
-        d3.select(".erasGrp").selectAll("rect").data(tl.erasArr).enter()
-          // one rect for each object in the array;
+        d3.select(this.rootEl).select(".erasGrp").selectAll("rect")
+            .data(tl.erasArr)
+            .enter()
           .append("rect")
-            // the id is the label, e.g., "UnitedKingdom" (alphanum only);
+            // the id is the condensed label, e.g., "UnitedKingdom" (alphanum only);
             .attr("id", function(d){ return d.label.replace(/\W/g, "") })
             .attr("x", function(d){ return tl.timeScaleFn(d.start) })
             .attr("y", function(d){ return tl.eraTopMargin + (d.topY * tl.eraHeight) })
-            // slightly rounded corners;
-            .attr("rx", 4)
+            .attr("rx", 4)  // slightly rounded corners;
             .attr("ry", 4)
             .attr("width", function(d){ return tl.timeScaleFn(d.stop) -
                                               tl.timeScaleFn(d.start) })
@@ -215,8 +225,8 @@
             .style("fill", function(d){ return d.bgcolor })
             .style("stroke-width", 1)
             .style("stroke", "black")
-            // show the two dates and the infoPanel;
             .on("mouseover", function(){
+              // show the two dates and the infoPanel;
             })
             .on("mouseout", function(){
             });
@@ -228,13 +238,13 @@
         // in such a case, we want to make the <div> wide enough and place
         // in evenly straddling the era.
         // create hidden dummy span;
-        const widthSpan = d3.select("body")
+        const widthSpan = d3.select(this.rootEl)
             .append("span")
             .attr("class", "overflowSpan")
             .style("position", "absolute")
             .style("visibility", "hidden");
         // nested function ============================== 
-        const getLeftAndStoreWidthVoffset = function(d) {
+        const getLeftAndStoreWidth = function(d) {
           // does widest word overflow? Sort by length descending;
           let words = d.label.split(/ /);
           let longestWord = words.sort((a,b) => b.length - a.length)[0];
@@ -243,20 +253,21 @@
           widthSpan.text(longestWord);
           // console.log("widthSpan clientWidth: ", widthSpan.property("clientWidth"))
           let longestWordWidth = widthSpan.property("clientWidth")
-          console.log("Width of \"" + longestWord + "\": " + longestWordWidth);
+          // console.log("Width of \"" + longestWord + "\": " + longestWordWidth);
           let widthOfEra = tl.timeScaleFn(d.stop) - tl.timeScaleFn(d.start);
-          console.log("Width of " + d.label + " era: " + widthOfEra);
+          // console.log("Width of " + d.label + " era: " + widthOfEra);
           if (widthOfEra > longestWordWidth) {
             /* If the longest word will fit in era, set width to that of era
                and position div at start year; */
+            console.log("Fits: " + longestWord + " is " + longestWordWidth + " in " + widthOfEra)
             d.width = widthOfEra
-            return tl.timeScaleFn(d.start) + 20 + "px";
+            return tl.timeScaleFn(d.start) + "px" /* + tl.svgSideMargin + "px"; */
           } else {
             /* Else, div has width of longest word and is positioned to the
                left of start year; */
             d.width = longestWordWidth + 2;
             // left is to the left of start by half of excess width + 2;
-            let left = tl.timeScaleFn(d.start) + 20 - 
+            let left = tl.timeScaleFn(d.start) - 
                             ((longestWordWidth - widthOfEra + 2) / 2);
             console.log("  startYearX: " + (tl.timeScaleFn(d.start) + tl.svgSideMargin))
             console.log("  left: " + left);
@@ -264,14 +275,14 @@
           }
         }; // end of function def;
         //======================================
-        d3.select(".tvTimeline")
+        d3.select(this.rootEl).select(".tvTimeline")
             .selectAll("div")
             .data(tl.erasArr)
             .enter()
           .append("div")
             .attr("class", "eraLabel")
             .attr("id", d => d.label.replace(/\W/g, "") + "Label")
-            .style("left", d => getLeftAndStoreWidthVoffset(d))
+            .style("left", d => getLeftAndStoreWidth(d))
             .style("top", d => tl.eraTopMargin + 10 + (d.topY * tl.eraHeight) + d.voffset + "px")
             .style("width", d => d.width + "px")
             .text(d => d.label)
@@ -314,7 +325,7 @@
   box-sizing: border-box;
   width: 98%;
   margin: 20px auto;
-  border: 3px solid #C11B17;
+  /* border: 3px solid #C11B17; */
 }
 .tvHeader, .tvFooter {
   padding: 15px 30px;

@@ -22,10 +22,24 @@ The timeline container's children are:
 
 ### The svg#svg container.
 
-The svg element has "margins" of 20 on each side so its clientWidth is 40 less than the tvTimeline clientWidth (1228).
+The svg element has "margins" of 20 on each side so its clientWidth is 1228 (40 less than the tvTimeline clientWidth of 1268).
 
 The height of the svg determines all the parent container heights. The default height of the svg container is 400 (eraTopMargin: 30; eraHeight: 316; timeAxisHeight:50); it can be increased/decreased by modifying the eraHeight value.
 
 ### Changing the size of the timeline.
 
-The height of the timeline can be changed by setting the tl.eraHeight
+The height of the timeline can be changed by setting the tl.eraHeight. This will permit more vertical space for ranges, events, etc.
+
+Dramatic changes to the default width will require some sort of non-trivial scaling (including font-sizes) to be worked out later.
+
+## Timeline elements: eras, ranges, events.
+
+### Eras.
+
+An era is used to show some sort of background condition. In the biblical timeline, they show the large-scale periods used by scholars. In a timeline showing the history of a country they might show wars, reigns, etc.
+
+An era is specified with four required properties: 1) a *label* which is normally displayed centered just below the top of the era; 2) a *start year*; 3) a *stop year*; and 4) a *bgcolor* to make the era stand out to the intended extent.
+
+#### Era Labels.
+
+The era labels are HTML divs which are absolutely positioned against the tvTimeline div.

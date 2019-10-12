@@ -43,7 +43,7 @@ export default {
         "dbKey": null,
         "title": "Hebrew Bible Overview: Eras and Precipitating Events",
         "subtitle": "",
-        "footerHTML": "This is <b>bold</b> and <i>italic</i>footer text.",
+        "footerHTML": "This is <b>bold</b> and <i>italic</i> footer text.",
         "startYear":      -1100,
         "stopYear":       100,
         "tickInterval":   100,
@@ -95,17 +95,17 @@ export default {
     changeProperty() {
       // changing a value in the timeline obj causes rerender;
       // this.timeline.title = 'Value changed'
-      this.timeline = Object.assign({}, this.timeline, {title: "Value changed"})
+      this.timelineA = Object.assign({}, this.timelineA, {title: "Value changed"})
     },
     addProperty() {
       // a new property in the timeline causes rerender;
-      this.timeline = Object.assign({}, this.timeline, {awesomeMentor: "Ben"})
+      this.timelineA = Object.assign({}, this.timelineA, {awesomeMentor: "Ben"})
     },
     addEra() {
       // does adding a new era cause a redrawing of the timeline?
-      this.timeline.erasArr.push({label: "Added era", start: 1922, stop: 1928, bgcolor: "#F5A9F2"})
+      this.timelineA.erasArr.push({label: "Added era", start: 1922, stop: 1928, bgcolor: "#F5A9F2"})
       // is this necessary?
-      this.timeline = Object.assign({}, this.timeline)  
+      this.timelineA = Object.assign({}, this.timelineA)  
     }
   }
 }

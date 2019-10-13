@@ -23,9 +23,12 @@
       -->
       <svg class="svg" width="1250px" height="400px" xmlns="http://www.w3.org/2000/svg">
         <g class="erasGrp"></g>
-        /* goes last to be topmost drawn */
+        <g class="eraStartDateGrp eraDateGrp"></g>
+        <g class="eraStopDateGrp eraDateGrp"></g>
+        /* goes last to be drawn topmost */
         <g class="timeAxisGrp"></g>
       </svg>
+      <div class="infoPanel" style="opacity: 1e-6;"></div>
       <!-- class="eraLabel" divs will be added here -->
     </div>
     <div class="tvFooter" v-html="tl.footerHTML">
@@ -96,7 +99,10 @@
               topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
             {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
           ],
-          "eraLabelsFontSize": "16px",
+          "eraLabelsFontSize": 16,
+          "eraDateFontSize": 16,
+          "showEraDatesOnHover": true,
+          "hasInfoPanel": false
         },
         rootEl: null,
       }
@@ -129,14 +135,18 @@
     methods: {
       drawTimeline() {
         this.removeEmptyHeaderFooter(this.tl)
-        this.initDimensions(this.tl)
+        this.initializeComponent(this.tl)
         this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
         if (Object.keys(this.tl).includes("erasArr") && this.tl.erasArr.length > 0) {
           this.normalizeEras(this.tl)
           this.drawEras(this.tl)
           // console.log("before labels")
           this.drawEraLabelsAsHTML(this.tl)
+          this.drawEraDates(this.tl)
         }
+        // testing;
+        const grpSel = d3.select(this.tl.svgEl).select(".eraStartDateGrp").selectAll("text")
+        console.dir(grpSel)
       },
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length +  tl.subtitle.trim().length === 0) {
@@ -146,35 +156,45 @@
           this.rootEl.getElementsByClassName("tvFooter")[0].remove()
         }
       },
-      initDimensions(tl) {
-        const borderPropValue = tl.borderWidth + "px solid " + tl.borderColor
-        d3.select(this.rootEl).selectAll(".tvHeader, .tvTimeline, .tvFooter")
-          .style("border", borderPropValue)
-        // const tvTimelineEl = this.rootEl.getElementsByClassName("tvTimeline")[0]
-        // tvTimelineEl.style.border = tl.borderWidth + "px solid " + tl.borderColor
-        const tvTimelineClientWidth = this.rootEl.getElementsByClassName("tvTimeline")[0].clientWidth
-        // other calculations depend on this tl.svgWidth value;
-        tl.svgWidth = tvTimelineClientWidth /* - (2 * tl.svgSideMargin) */
-        const svgEl = this.rootEl.getElementsByClassName("svg")[0]
-        console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
-        console.log("svg width is: " + svgEl.clientWidth)
-        console.log("svg height is: " + svgEl.clientHeight)
-
-        svgEl.setAttribute("width", tl.svgWidth)
-        svgEl.setAttribute("height", this.svgHeight)
-        console.log("new svg width is: " + svgEl.clientWidth)
-        console.log("new svg height is: " + svgEl.clientHeight)
-      },
-      drawTimeAxis(tl) {
-        // generate tick values;
-        const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
-        const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
-        // a function which converts a year to an x coordinate;
+      initializeComponent(tl) {
+        // time scaling function which converts a year to an x coordinate;
         tl.timeScaleFn = d3.scaleLinear()
             .domain([tl.startYear, tl.stopYear])
             .rangeRound([tl.svgSideMargin,
                          tl.svgWidth - tl.svgSideMargin])
             .nice();
+        // add borders to three elements;
+        const borderPropValue = tl.borderWidth + "px solid " + tl.borderColor
+        d3.select(this.rootEl).selectAll(".tvHeader, .tvTimeline, .tvFooter")
+          .style("border", borderPropValue)
+        // set svgWidth to tvTimeline clientWidth;
+        const tvTimelineClientWidth = this.rootEl.getElementsByClassName("tvTimeline")[0].clientWidth
+        // other calculations depend on this tl.svgWidth value;
+        tl.svgWidth = tvTimelineClientWidth /* - (2 * tl.svgSideMargin) */
+        tl.svgEl = this.rootEl.getElementsByClassName("svg")[0]
+        console.log("=========== " + this.componentID + "============")
+        /*
+        console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
+        console.log("orig svg width  is: " + tl.svgEl.clientWidth)
+        console.log("orig svg height is: " + tl.svgEl.clientHeight)
+        */
+        tl.svgEl.setAttribute("width", tl.svgWidth)
+        // set svgHeight (computed) which determines tvTimeline height;
+        tl.svgEl.setAttribute("height", this.svgHeight)
+        /*
+        console.log("new svg width   is: " + tl.svgEl.clientWidth)
+        console.log("new svg height  is: " + tl.svgEl.clientHeight)
+        */
+        // check for infoPanel text;
+        if (Object.keys(this.tl).includes("infoPanelBeginEndText") &&
+            Object.keys(this.tl.infoPanelBeginEndText).length > 0) {
+          tl.hasInfoPanel = true;
+        }
+      },
+      drawTimeAxis(tl) {
+        // generate tick values;
+        const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
+        const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
         // a function which returns the SVG for the axis;
         const timeAxisFn = d3.axisBottom(tl.timeScaleFn)
                 .tickValues(tickValues)
@@ -207,6 +227,7 @@
         tl.erasArr.forEach( obj => { if (Object.keys(obj).length !== 7) throw new Error("bad key count in era") })
       },
       drawEras(tl) {
+        const compRoot = this.rootEl
         /* typical era object: {label: "Great War", start: 1914, stop: 1918,
               topY: 0, height: 1.0, bgcolor: "#A9BCF5", voffset: 0} */
         d3.select(this.rootEl).select(".erasGrp").selectAll("rect")
@@ -214,7 +235,7 @@
             .enter()
           .append("rect")
             // the id is the condensed label, e.g., "UnitedKingdom" (alphanum only);
-            .attr("id", function(d){ return d.label.replace(/\W/g, "") })
+            .attr("class", function(d){ return d.label.replace(/\W/g, "") })
             .attr("x", function(d){ return tl.timeScaleFn(d.start) })
             .attr("y", function(d){ return tl.eraTopMargin + (d.topY * tl.eraHeight) })
             .attr("rx", 4)  // slightly rounded corners;
@@ -226,9 +247,37 @@
             .style("stroke-width", 1)
             .style("stroke", "black")
             .on("mouseover", function(){
-              // show the two dates and the infoPanel;
+              if (tl.showEraDatesOnHover) {
+                const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
+                d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", false);
+              }
+              if (tl.hasInfoPanel) {
+                const eraObj = this.__data__;
+                const leftX = tl.timeScaleFn(eraObj.start) - 10;
+                const topY  = tl.eraTopMargin + (eraObj.topY * tl.eraHeight) + 46;
+                let panelText = tl.infoPanelBeginEndText[eraObj.start];
+                panelText    += tl.infoPanelBeginEndText[eraObj.stop];
+                d3.select(compRoot).select(".infoPanel")
+                  .style("max-width", "400px")
+                  .style("left", leftX + "px")
+                  .style("top", topY + "px")
+                  .html(panelText)
+                  .transition()
+                  .duration(400)
+                  .style("opacity", 0.95);
+              }
             })
             .on("mouseout", function(){
+              if (tl.showEraDatesOnHover) {
+                const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
+                d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", true);
+              }
+              if (tl.hasInfoPanel) {
+                d3.select(compRoot).select(".infoPanel")
+                  .transition()
+                  .duration(400)
+                  .style("opacity", 1e-6);
+              }
             });
       },
       drawEraLabelsAsHTML(tl) {
@@ -237,7 +286,7 @@
         // if widest word is wider than the era itself, then it overflows;
         // in such a case, we want to make the <div> wide enough and place
         // in evenly straddling the era.
-        // create hidden dummy span;
+        // create temporary hidden span to meassure width;
         const widthSpan = d3.select(this.rootEl)
             .append("span")
             .attr("class", "overflowSpan")
@@ -267,10 +316,9 @@
                left of start year; */
             d.width = longestWordWidth + 2;
             // left is to the left of start by half of excess width + 2;
-            let left = tl.timeScaleFn(d.start) - 
-                            ((longestWordWidth - widthOfEra + 2) / 2);
-            console.log("  startYearX: " + (tl.timeScaleFn(d.start) + tl.svgSideMargin))
-            console.log("  left: " + left);
+            let left = Math.ceil(tl.timeScaleFn(d.start) - 
+                            ((longestWordWidth - widthOfEra + 2) / 2));
+            console.log("Doesn't fit: " + longestWord + " starts " + (tl.timeScaleFn(d.start) - left) + " to the left of startYear")
             return left + "px";
           }
         }; // end of function def;
@@ -286,8 +334,33 @@
             .style("top", d => tl.eraTopMargin + 10 + (d.topY * tl.eraHeight) + d.voffset + "px")
             .style("width", d => d.width + "px")
             .text(d => d.label)
-            .style("font-size", this.eraLabelsFontSize)
+            .style("font-size", this.eraLabelsFontSize) + "px"
         widthSpan.remove();
+      },
+      drawEraDates(tl) {
+        // nested function ================================
+        const drawGroupOfDates = function(startOrStop, self) {
+          const start = startOrStop == "start" ? true : false;
+          const whichGrp = start ? ".eraStartDateGrp" : ".eraStopDateGrp"
+          d3.select(self.rootEl).select(whichGrp)
+              .selectAll("text")
+              .data(tl.erasArr)
+              .enter()
+            .append("text")
+              .text(function(d){ return start ? d.start : d.stop })
+              .attr("class", function(d){ return d.label.replace(/\W/g, "") + " hidden"})
+              .attr("x", function(d){ return tl.timeScaleFn(start ? d.start : d.stop)})
+              .attr("y", tl.eraTopMargin - (0.5 * tl.eraDateFontSize))
+              .attr("text-anchor", "middle")
+              .attr("font-family", "sans-serif")
+              .attr("font-size", tl.eraDateFontSize + "px")
+              .attr("fill", "black")
+              .attr("text-rendering", "optimizeLegibility");
+              // .attr("font-weight", "bold")
+        }
+        // end nested function ================================
+        drawGroupOfDates("start", this)
+        drawGroupOfDates("stop", this)
       },
     }    
   }
@@ -307,6 +380,9 @@
 .prolog ul {
   text-align: left;
   columns: 3 auto;
+}
+.hidden {
+  display: none;
 }
 /* this is the root of the final component: it's
    1300 wide by default or set by parent with a prop;
@@ -354,6 +430,17 @@ svg {
   text-align: center;
   font-size: 16px; /* default */
   color: black;
+  pointer-events: none;
+}
+.infoPanel {
+  position: absolute;
+  z-index: 2;
+  /* note padding on p elements */
+  border: solid 1px #aaa;
+  border-radius: 8px;
+  background: aliceblue;
+  font: 15px sans-serif;
+  text-align: center;
   pointer-events: none;
 }
 </style>

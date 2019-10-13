@@ -4,7 +4,7 @@
     <TimelineView componentID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth"/>
     <TimelineView componentID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth"/>
     <div id="btns">
-      <span>Demonstrating that changes within parent affect the TimelineView component: &nbsp; &nbsp; </span>
+      <span>Demonstrating that changes within parent affect the topmost TimelineView component: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>
       &nbsp; &nbsp;
       <button class="button" @click="addProperty">Add a new property</button>

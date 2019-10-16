@@ -28,7 +28,7 @@
         /* goes last to be drawn topmost */
         <g class="timeAxisGrp"></g>
       </svg>
-      <div class="infoPanel" style="opacity: 1e-6;"></div>
+      <div class="infoModal" style="opacity: 1e-6;"></div>
       <!-- class="eraLabel" divs will be added here -->
     </div>
     <div class="tvFooter" v-html="tl.footerHTML">
@@ -102,7 +102,7 @@
           "eraLabelsFontSize": 16,
           "eraDateFontSize": 16,
           "showEraDatesOnHover": true,
-          "hasInfoPanel": false
+          "hasinfoModal": false
         },
         rootEl: null,
       }
@@ -185,10 +185,10 @@
         console.log("new svg width   is: " + tl.svgEl.clientWidth)
         console.log("new svg height  is: " + tl.svgEl.clientHeight)
         */
-        // check for infoPanel text;
-        if (Object.keys(this.tl).includes("infoPanelBeginEndText") &&
-            Object.keys(this.tl.infoPanelBeginEndText).length > 0) {
-          tl.hasInfoPanel = true;
+        // check for infoModal text;
+        if (Object.keys(this.tl).includes("infoModalBeginEndText") &&
+            Object.keys(this.tl.infoModalBeginEndText).length > 0) {
+          tl.hasinfoModal = true;
         }
       },
       drawTimeAxis(tl) {
@@ -251,13 +251,13 @@
                 const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
                 d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", false);
               }
-              if (tl.hasInfoPanel) {
+              if (tl.hasinfoModal) {
                 const eraObj = this.__data__;
                 const leftX = tl.timeScaleFn(eraObj.start) - 10;
                 const topY  = tl.eraTopMargin + (eraObj.topY * tl.eraHeight) + 46;
-                let panelText = tl.infoPanelBeginEndText[eraObj.start];
-                panelText    += tl.infoPanelBeginEndText[eraObj.stop];
-                d3.select(compRoot).select(".infoPanel")
+                let panelText = tl.infoModalBeginEndText[eraObj.start];
+                panelText    += tl.infoModalBeginEndText[eraObj.stop];
+                d3.select(compRoot).select(".infoModal")
                   .style("max-width", "400px")
                   .style("left", leftX + "px")
                   .style("top", topY + "px")
@@ -272,8 +272,8 @@
                 const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
                 d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", true);
               }
-              if (tl.hasInfoPanel) {
-                d3.select(compRoot).select(".infoPanel")
+              if (tl.hasinfoModal) {
+                d3.select(compRoot).select(".infoModal")
                   .transition()
                   .duration(400)
                   .style("opacity", 1e-6);
@@ -432,7 +432,7 @@ svg {
   color: black;
   pointer-events: none;
 }
-.infoPanel {
+.infoModal {
   position: absolute;
   z-index: 2;
   /* note padding on p elements */
@@ -443,4 +443,37 @@ svg {
   text-align: center;
   pointer-events: none;
 }
-</style>
+.infoModal p {
+  margin: 0;
+  padding: 6px 6px;
+}
+.timeAxisGrp path,
+.timeAxisGrp line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges; /* SVG attribute */
+}
+.timeAxisGrp text {
+  font-family: sans-serif;
+  font-size: 13px;
+  text-rendering: optimizeLegibility; /* SVG attribute */
+}
+.infoDisplay, .infoDisplay2, .discPanel {
+  width: 1160px;
+  margin-top: 20px;
+  padding: 20px;
+  border: 2px solid red;
+  column-count: 3;
+  -moz-column-count: 3;
+  -webkit-column-count: 3;
+  
+}
+.infoDisplay p, .infoDisplay2 p, .discPanel p {
+  text-indent: 1em;
+  margin-before: 0;
+  -moz-margin-before: 0;
+  -webkit-margin-before: 0;
+  margin-after: 0.3em;
+  -moz-margin-after: 0.3em;
+  -webkit-margin-after: 0.3em;
+}</style>

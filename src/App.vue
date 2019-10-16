@@ -2,7 +2,6 @@
   <div id="app">
     <HelloWorld msg="The Studio1 App: TimelineView component is in the blue border below!" />
     <TimelineView componentID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth"/>
-    <TimelineView componentID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth"/>
     <div id="btns">
       <span>Demonstrating that changes within parent affect the topmost TimelineView component: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>
@@ -11,6 +10,8 @@
       &nbsp; &nbsp;
       <button class="button" @click="addEra">Add a new era</button>
     </div>
+    <TimelineView componentID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth"/>
+    <TimelineView componentID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
   </div>
 </template>
 
@@ -41,7 +42,7 @@ export default {
       timelineB: {
         "name": "Hebrew Bible Overview Timeline",
         "dbKey": null,
-        "title": "Hebrew Bible Overview: Eras and Precipitating Events",
+        "title": "Timeline B: Eras and Precipitating Events",
         "subtitle": "",
         "footerHTML": "This is <b>bold</b> and <i>italic</i> footer text.",
         "startYear":      -1100,
@@ -88,8 +89,23 @@ export default {
           "70": "<p>In <b>70 CE</b>, the Romans ended the First Jewish War (66-70) by sacking Jerusalem and destroying the Temple.</p>"
         }
       },
+      timelineC: null,
       tvcWidth: 1302 /* allows for temporary 1px border */
     }
+  },
+  mounted: function() {
+    fetch("bibleoverview.json", {mode: 'no-cors'})
+    .then(response => {
+       if (!response.ok) { throw new Error("HTTP error " + response.status); }
+       return response.json();
+   })
+   .then(json => {
+       this.timelineC = json;
+   })
+   .catch(function (error) {
+       // this.dataError = true;
+       throw new Error("fetch error: " + error);
+   })
   },
   methods: {
     changeProperty() {

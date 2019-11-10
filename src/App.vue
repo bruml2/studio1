@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <HelloWorld msg="The Studio1 App: TimelineView component is in the blue border below!" />
-    <TimelineView componentID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth"/>
+    <TimelineView timelineID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth" :showProlog="showPrologForA" />
     <div id="btns">
       <span>Demonstrating that changes within parent affect the topmost TimelineView component: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>
@@ -10,8 +10,10 @@
       &nbsp; &nbsp;
       <button class="button" @click="addEra">Add a new era</button>
     </div>
-    <TimelineView componentID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth"/>
-    <TimelineView componentID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
+    <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth"/>
+    <div style="height: 40px;"></div>
+    <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
+    <div style="height: 40px;"></div>
   </div>
 </template>
 
@@ -90,7 +92,8 @@ export default {
         }
       },
       timelineC: null,
-      tvcWidth: 1302 /* allows for temporary 1px border */
+      tvcWidth: 1302, /* allows for temporary 1px border */
+      showPrologForA: true
     }
   },
   mounted: function() {
@@ -98,14 +101,14 @@ export default {
     .then(response => {
        if (!response.ok) { throw new Error("HTTP error " + response.status); }
        return response.json();
-   })
-   .then(json => {
+    })
+    .then(json => {
        this.timelineC = json;
-   })
-   .catch(function (error) {
+    })
+    .catch(function (error) {
        // this.dataError = true;
        throw new Error("fetch error: " + error);
-   })
+    })
   },
   methods: {
     changeProperty() {

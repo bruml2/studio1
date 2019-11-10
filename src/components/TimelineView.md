@@ -2,7 +2,7 @@
 
 ### The div#timelineViewContainer (root).
 
-It's offsetWidth/clientWidth (no border) is 1300px by default or set by the parent as a prop. It's height is sufficient to contain its children.
+It's offsetWidth/clientWidth (no border) is 1300px by default or set by the parent with a prop. It's height is sufficient to contain its children.
 
 ### The div#tvTimeline container and the svg#svg container.
 
@@ -43,3 +43,7 @@ An era is specified with four required properties: 1) a *label* which is normall
 #### Era Labels.
 
 The era labels are HTML divs which are absolutely positioned against the tvTimeline div.
+
+### Identifying multiple instances of TimelineView on one page.
+
+It's necessary to assign a unique ID to the root component of each instance of the component so that the JS which draws the timeline can target the correct svg element. This is done by passing a different componentID prop to each instance. 

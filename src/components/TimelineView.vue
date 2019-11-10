@@ -1,9 +1,11 @@
+<!-- for shadowed scrollbars see: https://markus.oberlehner.net/blog/scrolling-shadows-with-vue/
+-->
 <template>
   <div class="timelineViewContainer"
-       :id="componentID"
+       :id="timelineID"
        :style="{ width: tvcWidth + 'px' }"
   >
-    <div class="prolog"> <!-- this prolog is temporary: dev only -->
+    <div class="prolog" v-if="showProlog"> <!-- this prolog is temporary: dev only -->
       <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
       <ul>
         <li v-for="(value, key) in tl" :key="key">
@@ -41,7 +43,7 @@
 
   export default {
     props: {
-      componentID: {
+      timelineID: {
         type: String,
         required: false,
         default: "soleTimeline"
@@ -55,6 +57,11 @@
         type: Number,
         required: false,
         default: 1300
+      },
+      showProlog: {
+        type: Boolean,
+        required: false,
+        default: false
       }
     },
     data() {
@@ -124,12 +131,12 @@
       }
     },
     created: function() {
-      // merge prop into this.tl as target;
+      // merge timeline prop into this.tl as target;
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
       /* do I need to wrap this in this.$nextTick()?? */
-      this.rootEl = document.getElementById(this.componentID)
+      this.rootEl = document.getElementById(this.timelineID)
       this.drawTimeline()
     },
     methods: {
@@ -172,7 +179,7 @@
         // other calculations depend on this tl.svgWidth value;
         tl.svgWidth = tvTimelineClientWidth /* - (2 * tl.svgSideMargin) */
         tl.svgEl = this.rootEl.getElementsByClassName("svg")[0]
-        console.log("=========== " + this.componentID + "============")
+        console.log("=========== " + this.timelineID + "============")
         /*
         console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
         console.log("orig svg width  is: " + tl.svgEl.clientWidth)

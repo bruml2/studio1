@@ -31,7 +31,7 @@ export default {
     return {
       timelineA: { fromParent: 'Original value',
                   title: "AP European History",
-                  subtitle: "(not the default value: from parent via prop)",
+                  subtitle: "(not the default value: from parent via 'timeline' prop)",
                   erasArr: [
                     {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
                     {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},

@@ -27,14 +27,16 @@
         <g class="erasGrp"></g>
         <g class="eraStartDateGrp eraDateGrp"></g>
         <g class="eraStopDateGrp eraDateGrp"></g>
-        /* goes last to be drawn topmost */
+        <!-- goes last to be drawn topmost -->
         <g class="timeAxisGrp"></g>
       </svg>
+      <div class="eraLabelsGrp"></div>
       <div class="infoModal" style="opacity: 1e-6;"></div>
       <!-- class="eraLabel" divs will be added here -->
     </div>
     <div class="tvFooter" v-html="tl.footerHTML">
     </div>
+    <button @click="removeExistingEras" style="margin: 10px; font-size: 2rem;">Remove Eras</button>
   </div>
 </template>
 
@@ -131,29 +133,28 @@
       }
     },
     created: function() {
+      // console.log(`In created of ${this.timelineID}: `, this.timeline)
       // merge timeline prop into this.tl as target;
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
       /* do I need to wrap this in this.$nextTick()?? */
       this.rootEl = document.getElementById(this.timelineID)
+      // console.log(`In mounted of ${this.timelineID}: `, this.timeline)
       this.drawTimeline()
     },
     methods: {
       drawTimeline() {
         this.removeEmptyHeaderFooter(this.tl)
+        this.removeExistingEras(this.tl)
         this.initializeComponent(this.tl)
         this.drawTimeAxis(this.tl) /* need tl.timeScaleFn() */
         if (Object.keys(this.tl).includes("erasArr") && this.tl.erasArr.length > 0) {
           this.normalizeEras(this.tl)
           this.drawEras(this.tl)
-          // console.log("before labels")
           this.drawEraLabelsAsHTML(this.tl)
           this.drawEraDates(this.tl)
         }
-        // testing;
-        const grpSel = d3.select(this.tl.svgEl).select(".eraStartDateGrp").selectAll("text")
-        console.dir(grpSel)
       },
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length +  tl.subtitle.trim().length === 0) {
@@ -163,15 +164,23 @@
           this.rootEl.getElementsByClassName("tvFooter")[0].remove()
         }
       },
+      removeExistingEras() {
+        // remove existing content (incl 2 eraDateGrp);
+        // required where TL is fetched from URL (else doubled);
+        d3.select(this.rootEl).select('.erasGrp').selectAll('rect').remove()
+        d3.select(this.rootEl).selectAll('.eraDateGrp').selectAll('text').remove()
+        d3.select(this.rootEl).select('.eraLabelsGrp').selectAll('div').remove()
+        d3.select(this.rootEl).select('.infoModal').html(null)
+      },
       initializeComponent(tl) {
-        // time scaling function which converts a year to an x coordinate;
+        // time scaling function which maps a year to an x coordinate;
         tl.timeScaleFn = d3.scaleLinear()
             .domain([tl.startYear, tl.stopYear])
             .rangeRound([tl.svgSideMargin,
                          tl.svgWidth - tl.svgSideMargin])
             .nice();
         // add borders to three elements;
-        const borderPropValue = tl.borderWidth + "px solid " + tl.borderColor
+        const borderPropValue = `${tl.borderWidth}px solid ${tl.borderColor}`
         d3.select(this.rootEl).selectAll(".tvHeader, .tvTimeline, .tvFooter")
           .style("border", borderPropValue)
         // set svgWidth to tvTimeline clientWidth;
@@ -288,15 +297,13 @@
             });
       },
       drawEraLabelsAsHTML(tl) {
-        // const eraLabelsFontSize = "16px"; // add to tl;
         // eraLabels as **HTML divs** to take advantage of text wrapping;
         // if widest word is wider than the era itself, then it overflows;
         // in such a case, we want to make the <div> wide enough and place
-        // in evenly straddling the era.
+        // it evenly straddling the era.
         // create temporary hidden span to meassure width;
-        const widthSpan = d3.select(this.rootEl)
+        const tempWidthSpan = d3.select(this.rootEl)
             .append("span")
-            .attr("class", "overflowSpan")
             .style("position", "absolute")
             .style("visibility", "hidden");
         // nested function ============================== 
@@ -306,9 +313,9 @@
           let longestWord = words.sort((a,b) => b.length - a.length)[0];
           // console.log("Longest: " + longestWord);
           // put the longest word into the span;
-          widthSpan.text(longestWord);
-          // console.log("widthSpan clientWidth: ", widthSpan.property("clientWidth"))
-          let longestWordWidth = widthSpan.property("clientWidth")
+          tempWidthSpan.text(longestWord);
+          // console.log("tempWidthSpan clientWidth: ", tempWidthSpan.property("clientWidth"))
+          let longestWordWidth = tempWidthSpan.property("clientWidth")
           // console.log("Width of \"" + longestWord + "\": " + longestWordWidth);
           let widthOfEra = tl.timeScaleFn(d.stop) - tl.timeScaleFn(d.start);
           // console.log("Width of " + d.label + " era: " + widthOfEra);
@@ -330,7 +337,8 @@
           }
         }; // end of function def;
         //======================================
-        d3.select(this.rootEl).select(".tvTimeline")
+        console.log(tl.erasArr.map(el => el.label))
+        d3.select(this.rootEl).select('.eraLabelsGrp')
             .selectAll("div")
             .data(tl.erasArr)
             .enter()
@@ -342,7 +350,7 @@
             .style("width", d => d.width + "px")
             .text(d => d.label)
             .style("font-size", this.eraLabelsFontSize) + "px"
-        widthSpan.remove();
+        tempWidthSpan.remove();
       },
       drawEraDates(tl) {
         // nested function ================================

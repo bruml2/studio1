@@ -6,10 +6,10 @@
        :style="{ width: tvcWidth + 'px' }"
   >
     <div class="prolog" v-if="showProlog"> <!-- this prolog is temporary: dev only -->
-      <div>This green-bordered prolog containing the properties and values of tl is temporary.</div>
+      <div>The properties and values of <i>tl</i>:</div>
       <ul>
-        <li v-for="(value, key) in tl" :key="key">
-          <b>{{ key }}:</b> {{ value }}
+        <li v-for="(value, prop, idx) in tl" :key="prop">
+          {{ idx+1 }}. &nbsp; <b>{{ prop }}:</b> {{ value }}
         </li>
       </ul>
     </div>
@@ -165,7 +165,7 @@
         }
       },
       removeExistingEras() {
-        // remove existing content (incl 2 eraDateGrp);
+        // remove existing content (incl 2 eraDateGrps);
         // required where TL is fetched from URL (else doubled);
         d3.select(this.rootEl).select('.erasGrp').selectAll('rect').remove()
         d3.select(this.rootEl).selectAll('.eraDateGrp').selectAll('text').remove()
@@ -390,11 +390,11 @@
 }
 .prolog div {
   font-weight: bold;
-
 }
 .prolog ul {
   text-align: left;
   columns: 3 auto;
+  list-style-type: none;
 }
 .hidden {
   display: none;

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld msg="This app demonstrates multiple timeline components (blue borders) on one page." />
+    <HelloWorld msg="This app demonstrates multiple timeline components (in blue borders) on one page." />
     <div id="btns">
       <span>Demonstrating that changes within parent affect the "TimelineA" TimelineView component: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>

@@ -11,7 +11,7 @@
     </div>
     <TimelineView timelineID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth" :showProlog="true" />
     <div style="height: 40px;"></div>
-    <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth" :showProlog="true" />
+    <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
     <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
     <div style="height: 40px;"></div>

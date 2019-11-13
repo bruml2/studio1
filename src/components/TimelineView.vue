@@ -36,7 +36,6 @@
     </div>
     <div class="tvFooter" v-html="tl.footerHTML">
     </div>
-    <button @click="removeExistingEras" style="margin: 10px; font-size: 2rem;">Remove Eras</button>
   </div>
 </template>
 
@@ -114,6 +113,7 @@
           "hasInfoPanel": false
         },
         rootEl: null,
+        showLabelSizes: false
       }
     },
     computed: {
@@ -307,7 +307,7 @@
             .style("position", "absolute")
             .style("visibility", "hidden");
         // nested function ============================== 
-        const getLeftAndStoreWidth = function(d) {
+        const getLeftAndStoreWidth = function(d, self) {
           // does widest word overflow? Sort by length descending;
           let words = d.label.split(/ /);
           let longestWord = words.sort((a,b) => b.length - a.length)[0];
@@ -322,7 +322,7 @@
           if (widthOfEra > longestWordWidth) {
             /* If the longest word will fit in era, set width to that of era
                and position div at start year; */
-            console.log("Fits: " + longestWord + " is " + longestWordWidth + " in " + widthOfEra)
+            if (self.showLabelSizes) console.log("Fits: " + longestWord + " is " + longestWordWidth + " in " + widthOfEra)
             d.width = widthOfEra
             return tl.timeScaleFn(d.start) + "px" /* + tl.svgSideMargin + "px"; */
           } else {
@@ -332,7 +332,7 @@
             // left is to the left of start by half of excess width + 2;
             let left = Math.ceil(tl.timeScaleFn(d.start) - 
                             ((longestWordWidth - widthOfEra + 2) / 2));
-            console.log("Doesn't fit: " + longestWord + " starts " + (tl.timeScaleFn(d.start) - left) + " to the left of startYear")
+            if (self.showLabelSizes) console.log("Doesn't fit: " + longestWord + " starts " + (tl.timeScaleFn(d.start) - left) + " to the left of startYear")
             return left + "px";
           }
         }; // end of function def;
@@ -344,7 +344,7 @@
           .append("div")
             .attr("class", "eraLabel")
             .attr("id", d => d.label.replace(/\W/g, "") + "Label")
-            .style("left", d => getLeftAndStoreWidth(d))
+            .style("left", d => getLeftAndStoreWidth(d, this))
             .style("top", d => tl.eraTopMargin + 10 + (d.topY * tl.eraHeight) + d.voffset + "px")
             .style("width", d => d.width + "px")
             .text(d => d.label)

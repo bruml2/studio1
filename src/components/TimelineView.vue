@@ -111,7 +111,7 @@
           "eraLabelsFontSize": 16,
           "eraDateFontSize": 16,
           "showEraDatesOnHover": true,
-          "hasinfoModal": false
+          "hasInfoPanel": false
         },
         rootEl: null,
       }
@@ -190,21 +190,21 @@
         tl.svgEl = this.rootEl.getElementsByClassName("svg")[0]
         console.log("=========== " + this.timelineID + "============")
         /*
-        console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
-        console.log("orig svg width  is: " + tl.svgEl.clientWidth)
-        console.log("orig svg height is: " + tl.svgEl.clientHeight)
+          console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
+          console.log("orig svg width  is: " + tl.svgEl.clientWidth)
+          console.log("orig svg height is: " + tl.svgEl.clientHeight)
         */
         tl.svgEl.setAttribute("width", tl.svgWidth)
         // set svgHeight (computed) which determines tvTimeline height;
         tl.svgEl.setAttribute("height", this.svgHeight)
         /*
-        console.log("new svg width   is: " + tl.svgEl.clientWidth)
-        console.log("new svg height  is: " + tl.svgEl.clientHeight)
+          console.log("new svg width   is: " + tl.svgEl.clientWidth)
+          console.log("new svg height  is: " + tl.svgEl.clientHeight)
         */
-        // check for infoModal text;
-        if (Object.keys(this.tl).includes("infoModalBeginEndText") &&
-            Object.keys(this.tl.infoModalBeginEndText).length > 0) {
-          tl.hasinfoModal = true;
+        // check whether infoPanel text;
+        if (Object.keys(this.tl).includes("infoPanelBeginEndText") &&
+            Object.keys(this.tl.infoPanelBeginEndText).length > 0) {
+          tl.hasInfoPanel = true;
         }
       },
       drawTimeAxis(tl) {
@@ -267,12 +267,12 @@
                 const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
                 d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", false);
               }
-              if (tl.hasinfoModal) {
+              if (tl.hasInfoPanel) {
                 const eraObj = this.__data__;
                 const leftX = tl.timeScaleFn(eraObj.start) - 10;
                 const topY  = tl.eraTopMargin + (eraObj.topY * tl.eraHeight) + 46;
-                let panelText = tl.infoModalBeginEndText[eraObj.start];
-                panelText    += tl.infoModalBeginEndText[eraObj.stop];
+                let panelText = tl.infoPanelBeginEndText[eraObj.start];
+                panelText    += tl.infoPanelBeginEndText[eraObj.stop];
                 d3.select(compRoot).select(".infoModal")
                   .style("max-width", "400px")
                   .style("left", leftX + "px")
@@ -288,7 +288,7 @@
                 const classSelectorStr = ".eraDateGrp ." + d3.select(this).attr("class");
                 d3.select(compRoot).selectAll(classSelectorStr).classed("hidden", true);
               }
-              if (tl.hasinfoModal) {
+              if (tl.hasInfoPanel) {
                 d3.select(compRoot).select(".infoModal")
                   .transition()
                   .duration(400)
@@ -337,7 +337,6 @@
           }
         }; // end of function def;
         //======================================
-        console.log(tl.erasArr.map(el => el.label))
         d3.select(this.rootEl).select('.eraLabelsGrp')
             .selectAll("div")
             .data(tl.erasArr)

@@ -2,7 +2,7 @@
 
 ``
 "vue": {
-  "publicPath"; '/TimelineView/'
+  "publicPath": "/TimelineView/"
 }
 ``
 specifies that the built app will be served from ruml.com/TimelineView/

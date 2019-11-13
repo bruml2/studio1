@@ -47,6 +47,6 @@
     "last 2 versions"
   ],
   "vue": {
-    "publicPath"; '/TimelineView/'
+    "publicPath"; "/TimelineView/"
   }
 }

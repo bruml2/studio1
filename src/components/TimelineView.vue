@@ -1,6 +1,7 @@
 <!-- for shadowed scrollbars see: https://markus.oberlehner.net/blog/scrolling-shadows-with-vue/
 -->
 <template>
+  <!-- version 1.0 Feb 23 2020 -->
   <div class="timelineViewContainer"
        :id="timelineID"
        :style="{ width: tvcWidth + 'px' }"
@@ -133,14 +134,12 @@
       }
     },
     created: function() {
-      // console.log(`In created of ${this.timelineID}: `, this.timeline)
       // merge timeline prop into this.tl as target;
       Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
-      /* do I need to wrap this in this.$nextTick()?? */
       this.rootEl = document.getElementById(this.timelineID)
-      // console.log(`In mounted of ${this.timelineID}: `, this.timeline)
+      // console.log(`In mounted of ${this.timelineID}: `, this.tl)
       this.drawTimeline()
     },
     methods: {

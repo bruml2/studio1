@@ -1,12 +1,11 @@
 <template>
   <div id="app">
-    <div id="introbox" style="margin: 20px; padding: 20px; border: 3px solid teal;">
-      <h3>This app demonstrates multiple timeline components (in blue borders) on one page.</h3>
-      <h4 id="builddate">It was built on: {{ builddate }}. Maybe: {{ datefromfile }}</h4>
+    <div id="introbox" style="margin: 20px; padding: 4px; border: 3px solid teal;">
+      <h3>This site demonstrates multiple timeline components (in blue borders) on one page. [{{ builddate }}]</h3>
     </div>
 
     <div id="btns">
-      <span>Demonstrating that changes within parent affect the "TimelineA" TimelineView component: &nbsp; &nbsp; </span>
+      <span>Demonstrating that changes within parent affect the TimelineView component below: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>
       &nbsp; &nbsp;
       <button class="button" @click="addProperty">Add a new property</button>
@@ -27,7 +26,7 @@
 
 <script>
 import TimelineView   from '@/components/TimelineView.vue'
-import foo            from '@assets/builddate.js'
+import { builddate }  from './assets/builddate.js'
 
 export default {
   name: 'app',
@@ -36,11 +35,10 @@ export default {
   },
   data() {
     return {
-      builddate: "Mon Mar 2 2020",
-      datefromfile: foo,
+      builddate: builddate,
       timelineA: { fromParent: 'Original value',
-                  title: "AP European History",
-                  subtitle: "(not the default value: from parent via 'timeline' prop)",
+                  title: "U.S. History: ",
+                  subtitle: "the 20th century",
                   erasArr: [
                     {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
                     {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
@@ -126,7 +124,7 @@ export default {
     },
     addProperty() {
       // a new property in the timeline causes rerender;
-      this.timelineA = Object.assign({}, this.timelineA, {awesomeMentor: "Ben"})
+      this.timelineA = Object.assign({}, this.timelineA, {newProperty: "Ben"})
     },
     addEra() {
       // does adding a new era cause a redrawing of the timeline?

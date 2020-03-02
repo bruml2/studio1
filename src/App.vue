@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <HelloWorld msg="This app demonstrates multiple timeline components (in blue borders) on one page." />
+    <div id="introbox" style="margin: 20px; padding: 20px; border: 3px solid teal;">
+      <h3>This app demonstrates multiple timeline components (in blue borders) on one page.</h3>
+      <h4 id="builddate">It was built on: {{ builddate }}. Maybe: {{ datefromfile }}</h4>
+    </div>
+
     <div id="btns">
       <span>Demonstrating that changes within parent affect the "TimelineA" TimelineView component: &nbsp; &nbsp; </span>
       <button class="button" @click="changeProperty">Change Title Value</button>
@@ -9,27 +13,31 @@
       &nbsp; &nbsp;
       <button class="button" @click="addEra">Add a new era</button>
     </div>
+
     <TimelineView timelineID="timelineA" :timeline="timelineA" :tvcWidth="tvcWidth" :showProlog="true" />
     <div style="height: 40px;"></div>
+
     <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
+
     <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
     <div style="height: 40px;"></div>
   </div>
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue'
 import TimelineView   from '@/components/TimelineView.vue'
+import foo            from '@assets/builddate.js'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld,
     TimelineView
   },
   data() {
     return {
+      builddate: "Mon Mar 2 2020",
+      datefromfile: foo,
       timelineA: { fromParent: 'Original value',
                   title: "AP European History",
                   subtitle: "(not the default value: from parent via 'timeline' prop)",

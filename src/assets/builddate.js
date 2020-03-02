@@ -1,0 +1,1 @@
+export default const foo = "Fri Dec 30 2019"

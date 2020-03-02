@@ -20,7 +20,6 @@ cp dist/css/* /Library/WebServer/Documents/css
 rm /Library/WebServer/Documents/js/*
 cp dist/js/* /Library/WebServer/Documents/js
 echo "Copied to WebServer root"
-exit
 
 # copy to serve on localhost and to upload from rumlcomrepo
 #  ==> needs to have "vue": { "publicPath": "/timelines/app/" }
@@ -48,7 +47,14 @@ echo "Commited to new repo in dist"
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
 
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
+#   git push  <REMOTENAME> <LOCALBRANCHNAME>:<REMOTEBRANCHNAME> 
+# This pushes the LOCALBRANCHNAME to your REMOTENAME, but it is renamed to REMOTEBRANCHNAME.
 git push -f git@github.com:bruml2/studioTimelineView.git master:gh-pages
+
+# an aside: deleting a remote branch:
+#   git push  <REMOTENAME> :<BRANCHNAME> 
+# Note that there is a space before the colon. You're telling Git to push nothing into
+# BRANCHNAME on REMOTENAME, so git push deletes the branch on the remote repository.
 
 # return to previous directory
 cd -

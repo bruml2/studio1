@@ -49,7 +49,9 @@ echo "Commited to new repo in dist"
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
 #   git push  <REMOTENAME> <LOCALBRANCHNAME>:<REMOTEBRANCHNAME> 
 # This pushes the LOCALBRANCHNAME to your REMOTENAME, but it is renamed to REMOTEBRANCHNAME.
-git push -f git@github.com:bruml2/studioTimelineView.git master:gh-pages
+git remote add origin https://github.com/bruml2/studioTimelineView.git
+git push -f origin master:gh-pages
+echo "Pushed to gh-pages branch of origin"
 
 # an aside: deleting a remote branch:
 #   git push  <REMOTENAME> :<BRANCHNAME> 

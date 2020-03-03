@@ -118,19 +118,19 @@ export default {
   },
   methods: {
     changeProperty() {
-      // changing a value in the timeline obj causes rerender;
-      // this.timeline.title = 'Value changed'
-      this.timelineA = Object.assign({}, this.timelineA, {title: "Value changed"})
+      // changing a value in the timeline prop causes rerender;
+      this.timelineA.title = 'Value changed'
     },
     addProperty() {
-      // a new property in the timeline causes rerender;
-      this.timelineA = Object.assign({}, this.timelineA, {newProperty: "Ben"})
+      // a new property in the timeline does NOT cause a rerender;
+      // This DOES NOT WORK!!!
+      //    this.timelineA.newProperty = "newPropertyValue"
+      // MUST ASSIGN to the prop;
+      this.timelineA = Object.assign({}, this.timelineA, {newProperty: "newPropertyValue"})
     },
     addEra() {
       // does adding a new era cause a redrawing of the timeline?
       this.timelineA.erasArr.push({label: "Added era", start: 1922, stop: 1928, bgcolor: "#F5A9F2"})
-      // is this necessary?
-      this.timelineA = Object.assign({}, this.timelineA)  
     }
   }
 }

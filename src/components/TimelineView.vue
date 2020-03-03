@@ -7,7 +7,7 @@
        :style="{ width: tvcWidth + 'px' }"
   >
     <div class="prolog" v-if="showProlog"> <!-- this prolog is temporary: dev only -->
-      <div>The properties and values of the <b>timeline object</b>:</div>
+      <div>The properties and values of the <span>timeline prop</span> added to the default <span>tl object</span>:</div>
       <ul>
         <li v-for="(value, prop, idx) in tl" :key="prop">
           {{ idx+1 }}. &nbsp; <b>{{ prop }}:</b> {{ value }}
@@ -45,14 +45,14 @@
 
   export default {
     props: {
+      timeline: {
+        type: Object,
+        required: true
+      },
       timelineID: {
         type: String,
         required: false,
         default: "soleTimeline"
-      },
-      timeline: {
-        type: Object,
-        required: true
       },
       // used in computed property 'styleObject';
       tvcWidth: {
@@ -68,6 +68,10 @@
     },
     data() {
       return {
+        // tl is the default timeline object; it provides default values which
+        // may then be omitted from the timeline passed as a prop; all possible
+        // properties should be in this default because adding a property does
+        // not cause a re-render; it's not well examined yet.
         tl: {
           "name": "defaultTimeline",
           "dbKey": null,
@@ -110,27 +114,14 @@
           ],
           "eraLabelsFontSize": 16,
           "eraDateFontSize": 16,
+          "rangesArr": [],
+          "peopleArr": [],
+          "eventsArr": [],
           "showEraDatesOnHover": true,
           "hasInfoPanel": false
-        },
+        }, // end of tl
         rootEl: null,
         showLabelSizes: false
-      }
-    },
-    computed: {
-      svgHeight: function () {
-        return this.tl.eraTopMargin + 
-               this.tl.eraHeight +
-               this.tl.timeAxisHeight
-      } 
-    },
-    watch: {
-      timeline: function(newVal) {
-      // merge new value of prop into this.tl; note that an assignment must be
-      // made to this.tl; having this.tl as the target object (1st param) does
-      // not cause a re-render.
-      this.tl = Object.assign({}, this.tl, newVal)
-      this.drawTimeline()
       }
     },
     created: function() {
@@ -141,6 +132,24 @@
       this.rootEl = document.getElementById(this.timelineID)
       // console.log(`In mounted of ${this.timelineID}: `, this.tl)
       this.drawTimeline()
+    },
+    computed: {
+      svgHeight: function () {
+        return this.tl.eraTopMargin + 
+               this.tl.eraHeight +
+               this.tl.timeAxisHeight
+      } 
+    },
+    watch: {
+      // NB that ADDING a property to the prop will NOT cause a re-render!!
+      timeline: {
+        deep: true,
+        handler: function(newVal) {
+          // merge new value of prop into this.tl (preserving tl default values);
+          Object.assign(this.tl, newVal)
+          this.drawTimeline()
+        }
+      }
     },
     methods: {
       drawTimeline() {
@@ -388,6 +397,9 @@
 }
 .prolog div {
   font-weight: bold;
+}
+.prolog div span {
+  color: red;
 }
 .prolog ul {
   text-align: left;

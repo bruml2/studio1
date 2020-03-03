@@ -7,7 +7,7 @@
        :style="{ width: tvcWidth + 'px' }"
   >
     <div class="prolog" v-if="showProlog"> <!-- this prolog is temporary: dev only -->
-      <div>The properties and values of <i>tl</i>:</div>
+      <div>The properties and values of the <b>timeline object</b>:</div>
       <ul>
         <li v-for="(value, prop, idx) in tl" :key="prop">
           {{ idx+1 }}. &nbsp; <b>{{ prop }}:</b> {{ value }}
@@ -407,7 +407,7 @@
   box-sizing: border-box;
   margin: 0 auto;
   overflow-x: auto;
-  border: 1px solid blue;  /* temp */
+  border: 3px solid blue;  /* temp */
 }
 .tvHeader, .tvTimeline, .tvFooter {
   position: relative; /* parent container for positioning */

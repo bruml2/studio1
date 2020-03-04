@@ -7,19 +7,22 @@ set -e
 CURRDATE=`date "+%a %b %d %Y - %T"`
 echo "export const builddate = \"$CURRDATE\"" > src/assets/builddate.js
 
+# put publicPath for bruml2/github.io build in vue.config.js (temporarily);
+echo "module.exports = { publicPath: \"/studioTimelineView/\" }" > vue.config.js
+echo -e "\033[1;31m  ==> vue.config.js is: \"`cat vue.config.js`\"\033[0m"
+
 # build
 npm run build
 
+# restore original state: default publicPath and "date not set";
+rm vue.config.js
 echo "export const builddate = \"date not set\"" > src/assets/builddate.js
-echo "Built!"
+echo -e "\033[1;31m  Built! \033[0m"
 
-# for delivery at localhost/
-cp dist/index.html /Library/WebServer/Documents/
-rm /Library/WebServer/Documents/css/app.*.css
-cp dist/css/* /Library/WebServer/Documents/css
-rm /Library/WebServer/Documents/js/*
-cp dist/js/* /Library/WebServer/Documents/js
-echo "Copied to WebServer root"
+# for delivery at localhost/studioTimelineView;
+rm -r /Library/WebServer/Documents/studioTimelineView/*
+cp -r dist/* /Library/WebServer/Documents/studioTimelineView
+echo "\033[1;31m  Copied to WebServer root subdir studioTimelineView\033[0m"
 
 # copy to serve on localhost and to upload from rumlcomrepo
 #  ==> needs to have "vue": { "publicPath": "/timelines/app/" }
@@ -36,12 +39,12 @@ echo "Copied to WebServer root"
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
 
-# to push the dist to github!!
+# make a repo to push the dist to github!!
 cd dist
 git init
 git add -A
 git commit -m 'deploy'
-echo "Commited to new repo in dist"
+echo "\033[1;31m  Commited to new repo in dist \033[0m"
 
 # if you are deploying to https://<USERNAME>.github.io
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
@@ -51,7 +54,7 @@ echo "Commited to new repo in dist"
 # This pushes the LOCALBRANCHNAME to your REMOTENAME, but it is renamed to REMOTEBRANCHNAME.
 git remote add origin https://github.com/bruml2/studioTimelineView.git
 git push -f origin master:gh-pages
-echo "Pushed to gh-pages branch of origin"
+echo "\033[1;31m  Pushed to gh-pages branch of origin \033[0m"
 
 # an aside: deleting a remote branch:
 #   git push  <REMOTENAME> :<BRANCHNAME> 

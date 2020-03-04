@@ -142,6 +142,7 @@
     },
     watch: {
       // NB that ADDING a property to the prop will NOT cause a re-render!!
+      //  could use immediate: true to execute on load;
       timeline: {
         deep: true,
         handler: function(newVal) {

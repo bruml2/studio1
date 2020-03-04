@@ -22,7 +22,7 @@ echo -e "\033[1;31m  Built! \033[0m"
 # for delivery at localhost/studioTimelineView;
 rm -r /Library/WebServer/Documents/studioTimelineView/*
 cp -r dist/* /Library/WebServer/Documents/studioTimelineView
-echo "\033[1;31m  Copied to WebServer root subdir studioTimelineView\033[0m"
+echo -e "\033[1;31m  Copied to WebServer root subdir studioTimelineView\033[0m"
 
 # copy to serve on localhost and to upload from rumlcomrepo
 #  ==> needs to have "vue": { "publicPath": "/timelines/app/" }
@@ -44,7 +44,7 @@ cd dist
 git init
 git add -A
 git commit -m 'deploy'
-echo "\033[1;31m  Commited to new repo in dist \033[0m"
+echo -e "\033[1;31m  Commited to new repo in dist \033[0m"
 
 # if you are deploying to https://<USERNAME>.github.io
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
@@ -54,7 +54,7 @@ echo "\033[1;31m  Commited to new repo in dist \033[0m"
 # This pushes the LOCALBRANCHNAME to your REMOTENAME, but it is renamed to REMOTEBRANCHNAME.
 git remote add origin https://github.com/bruml2/studioTimelineView.git
 git push -f origin master:gh-pages
-echo "\033[1;31m  Pushed to gh-pages branch of origin \033[0m"
+echo -e "\033[1;31m  Pushed to gh-pages branch of origin \033[0m"
 
 # an aside: deleting a remote branch:
 #   git push  <REMOTENAME> :<BRANCHNAME> 

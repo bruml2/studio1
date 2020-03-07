@@ -24,8 +24,8 @@
 
     <div style="padding: 20px 0 0; border: 3px solid green;">
       <span>This is the TimeAxis component used in the UI</span>
-      <button @click="changeStartYear" style="margin-left: 20px;">change startYear</button>
-      <TimeAxis :timeAxisPropObj="timeAxisPropObj" />
+      <button @click="changeStartYear" style="margin-left: 20px;">change startYear to 1940</button>
+      <TimeAxisView :timeAxisPropObj="timeAxisPropObj" />
     </div>
     <div style="height: 40px;"></div>
   </div>
@@ -33,14 +33,14 @@
 
 <script>
 import TimelineView  from '@/components/TimelineView.vue'
-import TimeAxis      from '@/components/TimeAxis.vue'
+import TimeAxisView      from '@/components/TimeAxisView.vue'
 import { builddate } from './assets/builddate.js'
 
 export default {
   name: 'app',
   components: {
     TimelineView,
-    TimeAxis
+    TimeAxisView
   },
   data() {
     return {
@@ -110,9 +110,9 @@ export default {
       },
       timelineC: null, /* fetched from file system during mounted hook */
       timeAxisPropObj: {
-        startYear: 1940,
+        startYear: 1930,
         stopYear: 2000,
-        tickInterval: 5,
+        tickInterval: 10,
         svgWidth: 1000,
       },
       tvcWidth: 1302, /* allows for temporary 1px border */

@@ -1,5 +1,5 @@
 <template>
-  <div id="timeAxisComponent">
+  <div id="timeAxisView">
     <svg class="svg" :width="timeAxisObj.svgWidth" height="50px" xmlns="http://www.w3.org/2000/svg">
       <g class="timeAxisGrp"></g>
     </svg>
@@ -10,7 +10,7 @@
 import * as d3 from 'd3'
 
 export default {
-  name: "TimeAxisComponent",
+  name: "TimeAxisViewComponent",
   props: {
     // typcially: startYear, stopYear, tickInterval, svgWidth only;
     timeAxisPropObj: {
@@ -22,10 +22,10 @@ export default {
     return {
       rootEl: undefined,
       timeAxisObj: {
-        startYear: 1930,
+        startYear: 1920,
         stopYear: 1990,
         tickInterval: 10,
-        svgWidth: 1000,
+        svgWidth: 1020,
         svgSideMargin: 20,
         eraTopMargin: 0,
         eraHeight: 0,
@@ -38,8 +38,8 @@ export default {
     }
   },
   mounted: function() {
-    this.rootEl = document.getElementById("timeAxisComponent")
-    // console.log(`In mounted of ${this.timelineID}: `, this.tl)
+    this.rootEl = document.getElementById("timeAxisView")
+    Object.assign(this.timeAxisObj, this.timeAxisPropObj)
     this.drawTimeAxis(this.timeAxisObj)
   },
   watch: {
@@ -49,22 +49,16 @@ export default {
     timeAxisPropObj: {
       deep: true,
       handler: function(newVal) {
-        console.log("watch handler fired")
-        console.log("newVal: ")
-        console.dir(newVal)
-        // should be the same:
-        // Object.assign(this.timeAxisObj, newVal)
-        console.log("this.timeAxisObj: ")
-        console.dir(this.timeAxisObj)
-        Object.assign(this.timeAxisObj, this.timeAxisPropObj)
+        // newVal contains only the properties in timeAxisPropObj;
+        console.log("TimeAxisView watch handler fired")
+        Object.assign(this.timeAxisObj, newVal)
         this.drawTimeAxis(this.timeAxisObj)
       }
     }
   },
   methods: {
     drawTimeAxis(tl) {
-      console.log("in drawTimeAxis: tl: ")
-      console.dir(tl)
+      // tl is NOT the timeline object; it's the smaller timeAxisObj;
       tl.timeScaleFn = d3.scaleLinear()
         .domain([tl.startYear, tl.stopYear])
         .rangeRound([tl.svgSideMargin,
@@ -98,12 +92,11 @@ export default {
           .attr("text-rendering", "optimizeLegibility");
     }
   }
-
 }
 </script>
 
 <style scoped>
-#timeAxisComponent {
+#timeAxisView {
   display: inline-block;
   box-sizing: border-box;
   margin: 20px auto;

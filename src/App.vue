@@ -19,34 +19,44 @@
     <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
 
-    <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth"/>
+    <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth" />
+    <div style="height: 40px;"></div>
+
+    <div style="padding: 20px 0 0; border: 3px solid green;">
+      <span>This is the TimeAxis component used in the UI</span>
+      <button @click="changeStartYear" style="margin-left: 20px;">change startYear</button>
+      <TimeAxis :timeAxisPropObj="timeAxisPropObj" />
+    </div>
     <div style="height: 40px;"></div>
   </div>
 </template>
 
 <script>
-import TimelineView   from '@/components/TimelineView.vue'
-import { builddate }  from './assets/builddate.js'
+import TimelineView  from '@/components/TimelineView.vue'
+import TimeAxis      from '@/components/TimeAxis.vue'
+import { builddate } from './assets/builddate.js'
 
 export default {
   name: 'app',
   components: {
-    TimelineView
+    TimelineView,
+    TimeAxis
   },
   data() {
     return {
       builddate: builddate,
-      timelineA: { fromParent: 'Original value',
-                  title: "U.S. History: ",
-                  subtitle: "the 20th century",
-                  erasArr: [
-                    {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
-                    {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
-                    {label: "Korean War", start: 1950, stop: 1953, bgcolor: "#D0D1E6"},
-                    {label: "Vietnam War", start: 1963, stop: 1975,
-                            topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
-                    {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
-                  ]
+      timelineA: {
+        fromParent: 'Original value',
+        title: "U.S. History: ",
+        subtitle: "the 20th century",
+        erasArr: [
+          {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
+          {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
+          {label: "Korean War", start: 1950, stop: 1953, bgcolor: "#D0D1E6"},
+          {label: "Vietnam War", start: 1963, stop: 1975,
+                  topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
+          {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
+        ]
       },
       timelineB: {
         "name": "Hebrew Bible Overview Timeline",
@@ -99,6 +109,12 @@ export default {
         }
       },
       timelineC: null, /* fetched from file system during mounted hook */
+      timeAxisPropObj: {
+        startYear: 1940,
+        stopYear: 2000,
+        tickInterval: 5,
+        svgWidth: 1000,
+      },
       tvcWidth: 1302, /* allows for temporary 1px border */
     }
   },
@@ -131,6 +147,9 @@ export default {
     addEra() {
       // does adding a new era cause a redrawing of the timeline?
       this.timelineA.erasArr.push({label: "Added era", start: 1922, stop: 1928, bgcolor: "#F5A9F2"})
+    },
+    changeStartYear() {
+      this.timeAxisPropObj = Object.assign({}, this.timeAxisPropObj, {startYear: 1940})
     }
   }
 }

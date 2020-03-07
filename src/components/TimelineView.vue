@@ -154,6 +154,7 @@
     },
     methods: {
       drawTimeline() {
+        console.log("=========== " + this.timelineID + "============")
         this.removeEmptyHeaderFooter(this.tl)
         this.removeExistingEras(this.tl)
         this.initializeComponent(this.tl)
@@ -176,7 +177,10 @@
       removeExistingEras() {
         // remove existing content (incl 2 eraDateGrps);
         // required where TL is fetched from URL (else doubled);
-        d3.select(this.rootEl).select('.erasGrp').selectAll('rect').remove()
+        const erasGrps = d3.select(this.rootEl).select('.erasGrp').selectAll('rect')
+        console.log("erasGrps: ")
+        console.dir(erasGrps)
+        if (erasGrps) {erasGrps.remove()}
         d3.select(this.rootEl).selectAll('.eraDateGrp').selectAll('text').remove()
         d3.select(this.rootEl).select('.eraLabelsGrp').selectAll('div').remove()
         d3.select(this.rootEl).select('.infoModal').html(null)
@@ -197,7 +201,6 @@
         // other calculations depend on this tl.svgWidth value;
         tl.svgWidth = tvTimelineClientWidth /* - (2 * tl.svgSideMargin) */
         tl.svgEl = this.rootEl.getElementsByClassName("svg")[0]
-        console.log("=========== " + this.timelineID + "============")
         /*
           console.log("tvTimeline clientWidth is: " + tvTimelineClientWidth)
           console.log("orig svg width  is: " + tl.svgEl.clientWidth)

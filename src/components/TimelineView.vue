@@ -220,9 +220,13 @@
         }
       },
       drawTimeAxis(tl) {
+        // validate startYear (ends in 5 or 0) stopYear;
+        if (tl.startYear >= tl.stopYear && tl.startYear % 5 != 0) { throw new Error("startYear not valid")}
         // generate tick values;
         const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
         const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
+        // less than full interval to stopYear;
+        if (!Number.isInteger((tl.stopYear - tl.startYear)/tl.tickInterval)) { tickValues.push(tl.stopYear) }
         // a function which returns the SVG for the axis;
         const timeAxisFn = d3.axisBottom(tl.timeScaleFn)
                 .tickValues(tickValues)

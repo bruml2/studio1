@@ -24,7 +24,7 @@
 
     <div style="padding: 20px 0 0; border: 3px solid green;">
       <span>This is the TimeAxis component used in the UI</span>
-      <button @click="changeStartYear" style="margin-left: 20px;">change startYear to 1940</button>
+      <button @click="changeStartYear" style="margin-left: 20px;">change startYear to 1940; interval to 5</button>
       <TimeAxisView :timeAxisPropObj="timeAxisPropObj" />
     </div>
     <div style="height: 40px;"></div>
@@ -112,7 +112,7 @@ export default {
       timeAxisPropObj: {
         startYear: 1930,
         stopYear: 2000,
-        tickInterval: 10,
+        tickInterval: 20,
         svgWidth: 1000,
       },
       tvcWidth: 1302, /* allows for temporary 1px border */
@@ -149,7 +149,7 @@ export default {
       this.timelineA.erasArr.push({label: "Added era", start: 1922, stop: 1928, bgcolor: "#F5A9F2"})
     },
     changeStartYear() {
-      this.timeAxisPropObj = Object.assign({}, this.timeAxisPropObj, {startYear: 1940})
+      this.timeAxisPropObj = Object.assign({}, this.timeAxisPropObj, {startYear: 1940, tickInterval: 5})
     }
   }
 }

@@ -22,9 +22,10 @@
     <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
 
-    <div style="padding: 20px 0 0; border: 3px solid green;">
+    <div id="timeAxisView" style="padding: 20px 0 0; border: 3px solid green;">
       <span>This is the TimeAxis component used in the UI</span>
       <button @click="changeStartYear" style="margin-left: 20px;">change startYear to 1940; interval to 5</button>
+      <br />
       <TimeAxisView :timeAxisPropObj="timeAxisPropObj" />
     </div>
     <div style="height: 40px;"></div>
@@ -113,7 +114,7 @@ export default {
         startYear: 1930,
         stopYear: 2000,
         tickInterval: 20,
-        svgWidth: 1000,
+        svgWidth: 800,
       },
       tvcWidth: 1302, /* allows for temporary 1px border */
     }

@@ -1,6 +1,8 @@
 <template>
   <div id="timeAxisView">
-    <svg class="svg" :width="timeAxisObj.svgWidth" height="50px" xmlns="http://www.w3.org/2000/svg">
+    <svg class="svg" :width="timeAxisObj.svgWidth + 'px'"
+                     :height="timeAxisObj.timeAxisHeight + 'px'"
+                     xmlns="http://www.w3.org/2000/svg">
       <g class="timeAxisGrp"></g>
     </svg>
   </div>
@@ -25,10 +27,11 @@ export default {
         startYear: 1920,
         stopYear: 1990,
         tickInterval: 10,
-        svgWidth: 1020,
+        svgWidth: 600,
         svgSideMargin: 20,
         eraTopMargin: 0,
         eraHeight: 0,
+        timeAxisHeight: 50,
         timeAxisVerticalOffset: 25,
         timeAxisStroke: "black",
         timeAxisStrokeWidth: 2,
@@ -82,13 +85,11 @@ export default {
                 "translate(0, " + (tl.eraTopMargin + tl.eraHeight +
                                     tl.timeAxisVerticalOffset) + ")")
           .call(timeAxisFn);
-
       d3.select(this.rootEl).selectAll(".timeAxisGrp line, .timeAxisGrp path")
           .attr("stroke", tl.timeAxisStroke)
           .attr("stroke-width", tl.timeAxisStrokeWidth)
           .attr("fill", "none")
           .attr("shape-rendering", "crispEdges");
-
       d3.select(this.rootEl).selectAll(".timeAxisGrp text")
           .attr("font-family", tl.timeAxisFontFamily)
           .attr("font-size", tl.timeAxisFontSize)

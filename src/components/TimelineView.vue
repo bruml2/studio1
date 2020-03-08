@@ -16,8 +16,8 @@
     </div>
 
     <div class="tvHeader">
-      <span class="title">{{ tl.title }}</span> &nbsp; &nbsp;
-      <span class="subtitle">{{ tl.subtitle }}</span>
+      <span class="tltitle">{{ tl.title }}</span> &nbsp; &nbsp;
+      <span class="tlsubtitle">{{ tl.subtitle }}</span>
     </div>
     <div class="tvTimeline">
       <!--
@@ -443,12 +443,12 @@
 .tvHeader {
   font-weight: bold;
 }
-.title {
+.tltitle {
   font-size: 24px;
   color: #0404B4;
 }
-.subtitle {
-  font-size: 18px;
+.tlsubtitle {
+  font-size: 20px;
 }
 .tvTimeline {
   background-color: bisque;

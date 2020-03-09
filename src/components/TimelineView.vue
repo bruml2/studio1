@@ -68,18 +68,24 @@
     },
     data() {
       return {
+        tlPropIsValid: false,
         // tl is the default timeline object; it provides default values which
         // may then be omitted from the timeline passed as a prop; all possible
         // properties should be in this default because adding a property does
         // not cause a re-render; it's not well examined yet.
         tl: {
-          "name": "defaultTimeline",
+          /* this component renders the title/subtitle but not a timeline (in the
+            tvTimeline div) unless the timeline prop validates with:
+              startYear stopYear tickInterval */
+          /* 
+          "tlID": "defaultTimelineID in tl object",
           "dbKey": null,
           "title":        "AP United States History",
           "subtitle":     "(twentieth century)",
           "footerHTML":   "This is <b>bold</b> footer text.",
           "startYear":      1900,
           "stopYear":       2000,
+          */
           "tickInterval":   10,
           "bgColor":        "bisque",
           //   border: 3px solid #C11B17;
@@ -105,12 +111,14 @@
               eraHeight; height is fraction of height(0 to 1); optional:
               voffset is additional distance down for label; */
             /* {label: "Era Area", start: 1900, stop: 2000, bgcolor: "#FFFFE0"}, */
+            /*
             {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
             {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
             {label: "Korean War", start: 1950, stop: 1953, bgcolor: "#D0D1E6"},
             {label: "Vietnam War", start: 1963, stop: 1975,
               topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
             {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
+            */
           ],
           "eraLabelsFontSize": 16,
           "eraDateFontSize": 16,
@@ -121,16 +129,33 @@
           "hasInfoPanel": false
         }, // end of tl
         rootEl: null,
-        showLabelSizes: false
+        showLabelSizes: false,  // for debug of HTML labels
+        usPresidentsArr: null,
       }
-    },
-    created: function() {
-      // merge timeline prop into this.tl as target;
-      Object.assign(this.tl, this.timeline)
     },
     mounted: function() {
       this.rootEl = document.getElementById(this.timelineID)
-      // console.log(`In mounted of ${this.timelineID}: `, this.tl)
+      console.log(`In mounted of ${this.timelineID}: `, this.timeline)
+      // Add missing title, subtitle; check for start/stop/tickInt;
+      this.tlPropIsValid = this.validateTlProp(this.timeline)
+
+      // merge timeline prop into this.tl as target;
+      Object.assign(this.tl, this.timeline)
+      if (this.tl.showUSPresidents == true){
+        console.log("  Fetching US Presidents file")
+        fetch("USPresidentsArr.json", {mode: 'no-cors'})
+        .then(response => {
+          if (!response.ok) { throw new Error("HTTP error " + response.status); }
+          return response.json();
+        })
+        .then(json => {
+          this.usPresidentsArr = json;
+        })
+        .catch(function (error) {
+          // this.dataError = true;
+          throw new Error("fetch error: " + error);
+        })
+      }
       this.drawTimeline()
     },
     computed: {
@@ -146,15 +171,34 @@
       timeline: {
         deep: true,
         handler: function(newVal) {
-          // merge new value of prop into this.tl (preserving tl default values);
+          // do we need to validate newVal?
           Object.assign(this.tl, newVal)
           this.drawTimeline()
         }
       }
     },
     methods: {
+      /* d3 categorial colors:
+      getPastelColors() {
+        // https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Pastel1.js
+        let specifier = "fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2"
+        let numColors = specifier.length / 6     // nine
+        let colors = new Array(numColors)
+        let i = 0
+        while (i < numColors) colors[i] = "#" + specifier.slice(i * 6, ++i * 6)
+        return colors
+      }
+      */
+      validateTlProp(prop) {
+        if (!prop.title || prop.title == "") { prop.title = "No title supplied" }
+        if (!prop.subtitle) { prop.subtitle = "" }
+        if (!prop.footerHTML) { prop.footerHTML = "" }
+        if (!prop.startYear || !prop.stopYear || !prop.tickInterval ||
+            !prop.stopYear > prop.startYear || prop.startYear % 5 != 0) { return false }
+        return true
+      },
       drawTimeline() {
-        console.log("=========== " + this.timelineID + "============")
+        console.log("=========== drawing " + this.timelineID + " ============")
         this.removeEmptyHeaderFooter(this.tl)
         this.removeExistingEras(this.tl)
         this.initializeComponent(this.tl)
@@ -165,6 +209,12 @@
           this.drawEraLabelsAsHTML(this.tl)
           this.drawEraDates(this.tl)
         }
+        if (this.tl.usPresidentsArr) {
+          this.drawUSPresidents(this.tl)
+        }
+      },
+      drawUSPresidents(tl) {
+        console.log("In drawUSPresidents()", tl)
       },
       removeEmptyHeaderFooter(tl) {
         if (tl.title.trim().length +  tl.subtitle.trim().length === 0) {

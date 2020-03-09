@@ -50,6 +50,9 @@ export default {
         fromParent: 'Original value',
         title: "U.S. History: ",
         subtitle: "the 20th century",
+        startYear: 1900,
+        stopYear: 2000,
+        tickInterval: 10,
         erasArr: [
           {label: "Great War", start: 1914, stop: 1918, bgcolor: "#A9BCF5"},
           {label: "WWII", start: 1939, stop: 1945, bgcolor: "#A9E2F3"},
@@ -57,7 +60,8 @@ export default {
           {label: "Vietnam War", start: 1963, stop: 1975,
                   topY: 0.5, height: 0.5, bgcolor: "#FFF8DC"},
           {label: "Gulf War", start: 1990, stop: 1991, bgcolor: "#ECE7F2"},
-        ]
+        ],
+        showUSPresidents: true
       },
       timelineB: {
         "name": "Hebrew Bible Overview Timeline",

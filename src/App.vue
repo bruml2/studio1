@@ -113,7 +113,7 @@ export default {
           "70": "<p>In <b>70 CE</b>, the Romans ended the First Jewish War (66-70) by sacking Jerusalem and destroying the Temple.</p>"
         }
       },
-      timelineC: null, /* fetched from file system during mounted hook */
+      timelineC: {}, /* fetched from file system during created hook */
       timeAxisPropObj: {
         startYear: 1930,
         stopYear: 2000,
@@ -123,7 +123,7 @@ export default {
       tvcWidth: 1302, /* allows for temporary 1px border */
     }
   },
-  mounted: function() {
+  created: function() {
     fetch("bibleoverview.json", {mode: 'no-cors'})
     .then(response => {
        if (!response.ok) { throw new Error("HTTP error " + response.status); }

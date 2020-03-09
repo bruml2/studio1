@@ -135,7 +135,7 @@
     },
     mounted: function() {
       this.rootEl = document.getElementById(this.timelineID)
-      console.log(`In mounted of ${this.timelineID}: `, this.timeline)
+      console.log(`============ ${this.timelineID} (in mounted hook): timeline prop: `, this.timeline)
       // Add missing title, subtitle; check for start/stop/tickInt;
       this.tlPropIsValid = this.validateTlProp(this.timeline)
 
@@ -190,6 +190,7 @@
       }
       */
       validateTlProp(prop) {
+        console.log("In validateTlProp: ", prop)
         if (!prop.title || prop.title == "") { prop.title = "No title supplied" }
         if (!prop.subtitle) { prop.subtitle = "" }
         if (!prop.footerHTML) { prop.footerHTML = "" }
@@ -198,7 +199,7 @@
         return true
       },
       drawTimeline() {
-        console.log("=========== drawing " + this.timelineID + " ============")
+        console.log(`=========== drawing ${this.timelineID} ============`, this.tl)
         this.removeEmptyHeaderFooter(this.tl)
         this.removeExistingEras(this.tl)
         this.initializeComponent(this.tl)
@@ -274,9 +275,13 @@
         if (tl.startYear >= tl.stopYear && tl.startYear % 5 != 0) { throw new Error("startYear not valid")}
         // generate tick values;
         const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
+        console.log("Before 1")
         const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
+        console.log("After 1")
         // less than full interval to stopYear;
+        console.log("Before 2")
         if (!Number.isInteger((tl.stopYear - tl.startYear)/tl.tickInterval)) { tickValues.push(tl.stopYear) }
+        console.log("After 2")
         // a function which returns the SVG for the axis;
         const timeAxisFn = d3.axisBottom(tl.timeScaleFn)
                 .tickValues(tickValues)

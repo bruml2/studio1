@@ -1,0 +1,142 @@
+[
+{
+  "from": 1901,
+  "to":   1909,
+  "name": "Theodore Roosevelt",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:President_Roosevelt_-_Pach_Bros.jpg"
+},
+{
+  "from": 1909,
+  "to":   1913,
+  "name": "Willian Howard Taft",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:William_Howard_Taft,_head-and-shoulders_portrait,_facing_front.jpg"
+},
+{
+  "from": 1913,
+  "to":   1921,
+  "name": "Woodrow Wilson",
+  "party": "Democratic",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Woodrow_Wilson-H&E.jpg"
+},
+{
+  "from": 1921,
+  "to":   1923,
+  "name": "Warren G. Harding",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Warren_G_Harding-Harris_&_Ewing.jpg"
+},
+{
+  "from": 1923,
+  "to":   1929,
+  "name": "Calvin 'Coolidge",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Calvin_Coolidge_cph.3g10777_(cropped).jpg"
+},
+{
+  "from": 1929,
+  "to":   1933,
+  "name": "Herbert Hoover",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:President_Hoover_portrait.jpg"
+},
+{
+  "from": 1933,
+  "to":   1945,
+  "name": "Franklin Delano Roosevelt",
+  "party": "Democratic",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:FDR_1944_Color_Portrait.jpg"
+},
+{
+  "from": 1945,
+  "to":   1953,
+  "name": "Herbert Hoover",
+  "party": "Democratic",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:TRUMAN_58-766-06_CROPPED.jpg"
+},
+{
+"from": 1953,
+"to":   1961,
+"name": "Dwight D. Eisenhower",
+"party": "Republican",
+"portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Dwight_D._Eisenhower,_official_photo_portrait,_May_29,_1959.jpg"
+},
+{
+"from": 1961,
+"to":   1963,
+"name": "John F. Kennedy",
+"party": "Democratic",
+"portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:John_F._Kennedy,_White_House_color_photo_portrait.jpg"
+},
+{
+"from": 1963,
+"to":   1969,
+"name": "Lyndon Baines Johnson",
+"party": "Democratic",
+"portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:37_Lyndon_Johnson_3x4.jpg"
+},
+{
+"from": 1969,
+"to":   1974,
+"name": "Richard M. Nixon",
+"party": "Republican",
+"portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Richard_M._Nixon,_ca._1935_-_1982_-_NARA_-_530679.jpg"
+},
+{
+"from": 1974,
+"to":   1977,
+"name": "Gerald Ford",
+"party": "Republican",
+"portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Gerald_Ford_presidential_portrait.jpg"
+},
+{
+  "from": 1977,
+  "to":   1981,
+  "name": "Jimmy Carter",
+  "party": "Democratic",
+  "portrait": "https://upload.wikimedia.org/wikipedia/commons/5/5a/JimmyCarterPortrait2.jpg"
+},
+{
+  "from": 1981,
+  "to":   1989,
+  "name": "Ronald Reagan",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Official_Portrait_of_President_Reagan_1981.jpg"
+},
+{
+  "from": 1989,
+  "to":   1993,
+  "name": "George H. W. Bush",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:George_H._W._Bush,_President_of_the_United_States,_1989_official_portrait_(cropped).jpg"
+},
+{
+  "from": 1993,
+  "to":   2001,
+  "name": "Bill Clinton",
+  "party": "Democratic",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Bill_Clinton.jpg"
+},
+{
+  "from": 2001,
+  "to":   2009,
+  "name": "George W. Bush",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:George-W-Bush.jpeg"
+},
+{
+  "from": 2009,
+  "to":   2017,
+  "name": "Barack Obama",
+  "party": "Democratic",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Official_portrait_of_Barack_Obama.jpg"
+},
+{
+  "from": 2017,
+  "to":   2021,
+  "name": "Donald J. Trump",
+  "party": "Republican",
+  "portrait": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_United_States#/media/File:Donald_Trump_official_portrait.jpg"
+}
+]

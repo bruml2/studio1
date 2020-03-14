@@ -68,7 +68,6 @@
     },
     data() {
       return {
-        tlPropIsValid: false,
         // tl is the default timeline object; it provides default values which
         // may then be omitted from the timeline passed as a prop; all possible
         // properties should be in this default because adding a property does
@@ -136,11 +135,7 @@
     mounted: function() {
       this.rootEl = document.getElementById(this.timelineID)
       console.log(`============ ${this.timelineID} (in mounted hook): timeline prop: `, this.timeline)
-      // Add missing title, subtitle; check for start/stop/tickInt;
-      this.tlPropIsValid = this.validateTlProp(this.timeline)
 
-      // merge timeline prop into this.tl as target;
-      Object.assign(this.tl, this.timeline)
       if (this.tl.showUSPresidents == true){
         console.log("  Fetching US Presidents file")
         fetch("USPresidentsArr.json", {mode: 'no-cors'})
@@ -156,7 +151,16 @@
           throw new Error("fetch error: " + error);
         })
       }
-      this.drawTimeline()
+
+      // Add missing title, subtitle; check for start/stop/tickInt;
+      if (this.tlPropIsValid(this.timeline)) {
+        // merge timeline prop into this.tl as target;
+        Object.assign(this.tl, this.timeline)
+        this.drawTimeline()
+      } else {
+        // trigger watch handler;
+        this.timeline.failedToRenderOnMount = true
+      }
     },
     computed: {
       svgHeight: function () {
@@ -171,13 +175,18 @@
       timeline: {
         deep: true,
         handler: function(newVal) {
-          // do we need to validate newVal?
-          Object.assign(this.tl, newVal)
-          this.drawTimeline()
+          console.log("  ===> In watch handler for timeline prop")
+          if (this.tlPropIsValid(newVal)) {
+            Object.assign(this.tl, newVal)
+            this.drawTimeline()
+          }
         }
       }
     },
     methods: {
+      /* https://d3-annotation.susielu.com/ */
+      /* d3 categorical colors: Tableau10.js
+         colors("4e79a7f28e2ce1575976b7b259a14fedc949af7aa1ff9da79c755fbab0ab"); */
       /* d3 categorial colors:
       getPastelColors() {
         // https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Pastel1.js
@@ -189,17 +198,21 @@
         return colors
       }
       */
-      validateTlProp(prop) {
-        console.log("In validateTlProp: ", prop)
+      tlPropIsValid(prop) {
+        console.log("In tlPropIsValid: ", prop)
         if (!prop.title || prop.title == "") { prop.title = "No title supplied" }
         if (!prop.subtitle) { prop.subtitle = "" }
         if (!prop.footerHTML) { prop.footerHTML = "" }
         if (!prop.startYear || !prop.stopYear || !prop.tickInterval ||
-            !prop.stopYear > prop.startYear || prop.startYear % 5 != 0) { return false }
+            !(prop.stopYear > prop.startYear) || prop.startYear % 5 != 0) {
+          console.log("bad: ", prop.startYear, prop.stopYear, prop.tickInterval)
+          return false 
+        }
         return true
       },
       drawTimeline() {
         console.log(`=========== drawing ${this.timelineID} ============`, this.tl)
+        if (!this.tlPropIsValid(this.tl)) { throw new Error("tl prop invalid") }
         this.removeEmptyHeaderFooter(this.tl)
         this.removeExistingEras(this.tl)
         this.initializeComponent(this.tl)
@@ -271,8 +284,7 @@
         }
       },
       drawTimeAxis(tl) {
-        // validate startYear (ends in 5 or 0) stopYear;
-        if (tl.startYear >= tl.stopYear && tl.startYear % 5 != 0) { throw new Error("startYear not valid")}
+        // tlPropIsValid() ;
         // generate tick values;
         const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
         console.log("Before 1")

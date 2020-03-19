@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <div id="mixinTest" style="margin: 20px; padding: 10px; border: 3px solid brown;">
+      <MixinTest />
+    </div>
+    <!--
     <div id="introbox" style="margin: 20px; padding: 4px; border: 3px solid teal;">
       <h3>This site demonstrates multiple timeline components (in blue borders) on one page. [{{ builddate }}]</h3>
     </div>
@@ -18,10 +22,12 @@
 
     <TimelineView timelineID="timelineB" :timeline="timelineB" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
+    -->
 
+<!--
     <TimelineView timelineID="timelineC" :timeline="timelineC" :tvcWidth="tvcWidth" />
     <div style="height: 40px;"></div>
-
+-->
     <div id="timeAxisView" style="padding: 20px 0 0; border: 3px solid green;">
       <span>This is the TimeAxis component used in the UI</span>
       <button @click="changeStartYear" style="margin-left: 20px;">change startYear to 1940; interval to 5</button>
@@ -33,14 +39,16 @@
 </template>
 
 <script>
-import TimelineView  from '@/components/TimelineView.vue'
-import TimeAxisView      from '@/components/TimeAxisView.vue'
+import MixinTest     from '@/components/MixinTest.vue'
+// import TimelineView  from '@/components/TimelineView.vue'
+import TimeAxisView  from '@/components/TimeAxisView.vue'
 import { builddate } from './assets/builddate.js'
 
 export default {
   name: 'app',
   components: {
-    TimelineView,
+    MixinTest,
+    // TimelineView,
     TimeAxisView
   },
   data() {

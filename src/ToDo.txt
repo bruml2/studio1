@@ -1,0 +1,18 @@
+Follow up: great mixins like getViewportSize: https://github.com/paulpflug/vue-mixins
+           bit as a component repository: 
+           storybook as a dev environment
+           standard web component libraries: https://blog.bitsrc.io/9-web-component-ui-libraries-you-should-know-in-2019-9d4476c3f103
+           vue component libraries: https://blog.bitsrc.io/11-vue-js-component-libraries-you-should-know-in-2018-3d35ad0ae37f
+
+Sun Mar 15
+- get mixin working:
+    test with simple component
+- In built app, changing title works, but new property does not trigger rerender and add new era pushes to displayed properties but does not draw.
+- continue to get error in removeEmptyHeaderFooter of "Cannot read property 'remove' of undefined"
+
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.vue$": "vue-jest"
+    }
+  },

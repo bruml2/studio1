@@ -42,8 +42,11 @@
 
 <script>
   import * as d3 from 'd3'
+  import mixin1 from '../mixins/getTickValues.js'
 
   export default {
+    name: "TimelineView",
+    mixins: [mixin1],
     props: {
       timeline: {
         type: Object,
@@ -286,6 +289,7 @@
       drawTimeAxis(tl) {
         // tlPropIsValid() ;
         // generate tick values;
+        /*
         const numTicks = Math.floor((tl.stopYear - tl.startYear)/tl.tickInterval) + 1
         console.log("Before 1")
         const tickValues = Array(numTicks).fill(tl.startYear).map((start, index) => start + (index * tl.tickInterval))
@@ -294,6 +298,9 @@
         console.log("Before 2")
         if (!Number.isInteger((tl.stopYear - tl.startYear)/tl.tickInterval)) { tickValues.push(tl.stopYear) }
         console.log("After 2")
+        */
+       // from the mixin:
+        const tickValues = this.getTickValues(tl.startYear, tl.stopYear, tl.tickInterval)
         // a function which returns the SVG for the axis;
         const timeAxisFn = d3.axisBottom(tl.timeScaleFn)
                 .tickValues(tickValues)
